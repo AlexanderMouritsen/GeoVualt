@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gv-bg: #f9fafb;
+  --gv-surface: #ffffff;
+  --gv-border: #e5e7eb;
+  --gv-text: #292524;
+  --gv-text-muted: #57534e;
+  --gv-primary: #0f6e56;
+  --gv-accent: #ba7517;
+  --gv-geodle: #0f6e56;
+  --gv-georankle: #534ab7;
+  --gv-geoconnections: #ba7517;
+  --gv-geogrid: #185fa5;
+}
+
+body {
+  margin: 0;
+  color: var(--gv-text);
+  background: var(--gv-bg);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
