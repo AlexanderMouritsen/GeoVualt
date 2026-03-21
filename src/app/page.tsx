@@ -10,100 +10,129 @@ export default function Home() {
 
   const modes = [
     {
-      href: '/geodle',
-      mode: 'geodle' as GameMode,
-      name: 'Geodle',
-      description: 'Guess the mystery country in 6 tries with structured feedback.',
-      accent: 'var(--gv-geodle)',
-      status: 'Polished',
-    },
-    {
       href: '/georankle',
       mode: 'georankle' as GameMode,
       name: 'GeoRankle',
       description: 'Pick the metric where a country ranks highest globally.',
-      accent: 'var(--gv-georankle)',
-      status: 'Polished',
+      color: 'var(--gv-georankle)',
+      status: 'Daily',
+      icon: (
+        <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.6">
+          <path d="M4 18h16" />
+          <path d="M7 15l3-3 3 2 4-5" />
+          <circle cx="7" cy="15" r="1" />
+          <circle cx="10" cy="12" r="1" />
+          <circle cx="13" cy="14" r="1" />
+          <circle cx="17" cy="9" r="1" />
+        </svg>
+      ),
+    },
+    {
+      href: '/geodle',
+      mode: 'geodle' as GameMode,
+      name: 'Geodle',
+      description: 'Guess the mystery country with unlimited tries and structured feedback.',
+      color: 'var(--gv-geodle)',
+      status: 'Daily',
+      icon: (
+        <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.6">
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 6v12" />
+          <path d="M6 12h12" />
+        </svg>
+      ),
     },
     {
       href: '/geoconnections',
       mode: 'geoconnections' as GameMode,
       name: 'GeoConnections',
       description: 'Solve groups of tiles that belong to the same country.',
-      accent: 'var(--gv-geoconnections)',
-      status: 'Beta',
+      color: 'var(--gv-geoconnections)',
+      status: 'Daily',
+      icon: (
+        <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.6">
+          <path d="M7 7h4v4H7z" />
+          <path d="M13 7h4v4h-4z" />
+          <path d="M7 13h4v4H7z" />
+          <path d="M13 13h4v4h-4z" />
+        </svg>
+      ),
     },
     {
       href: '/geogrid',
       mode: 'geogrid' as GameMode,
       name: 'GeoGrid',
       description: 'Fill a 3x3 category grid with rare and valid countries.',
-      accent: 'var(--gv-geogrid)',
-      status: 'Beta',
+      color: 'var(--gv-geogrid)',
+      status: 'Bonus',
+      icon: (
+        <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.6">
+          <path d="M4 4h16v16H4z" />
+          <path d="M4 10h16" />
+          <path d="M4 16h16" />
+          <path d="M10 4v16" />
+          <path d="M16 4v16" />
+        </svg>
+      ),
     },
   ]
 
   const today = new Date().toISOString().slice(0, 10)
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[880px] px-6 py-10">
-      <section className="rounded-2xl border bg-white p-6" style={{ borderColor: 'var(--gv-border)' }}>
-        <div className="flex items-center gap-3">
-          <div
-            aria-hidden
-            className="size-9 rounded-full border"
-            style={{ borderColor: 'var(--gv-primary)', backgroundColor: '#e1f5ee' }}
-          />
-          <h1 className="text-2xl font-semibold text-stone-800">GeoVault</h1>
+    <main className="mx-auto min-h-screen w-full max-w-[1400px] px-6 py-8">
+      <section className="mx-auto max-w-[1320px]">
+        <h1 className="text-2xl font-semibold tracking-[-0.01em] text-[var(--text-primary)] md:text-3xl">Daily Games</h1>
+        <p className="mt-2 gv-mono text-xs text-[var(--text-muted)]">challenge seed :: {today}</p>
+
+        <div className="gv-rule mt-5" />
+
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {modes.map((mode) => (
+            <Link
+              key={mode.name}
+              href={mode.href}
+              className="gv-daily-card relative overflow-hidden"
+            >
+              <div className="absolute ml-[-20px] mt-[-20px] h-full w-1" style={{ backgroundColor: mode.color }} />
+              <div className="flex items-start justify-between">
+                <div className="text-[var(--text-muted)]">{mode.icon}</div>
+                <p className="gv-mono text-[11px] uppercase tracking-[0.16em] text-[var(--accent-gold)]">{mode.status}</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-[var(--text-primary)]">{mode.name}</p>
+                <p className="mt-2 text-sm text-[var(--text-muted)]">{mode.description}</p>
+              </div>
+            </Link>
+          ))}
         </div>
-        <p className="mt-2 text-stone-600">Unlock the world, one game at a time.</p>
-        <p className="mt-4 inline-flex rounded-full border px-3 py-1 text-xs text-stone-700" style={{ borderColor: 'var(--gv-border)' }}>
-          Daily challenge active · {today}
-        </p>
+
       </section>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-2">
-        {modes.map((mode) => (
-          <Link
-            key={mode.name}
-            href={mode.href}
-            className="rounded-2xl border bg-white p-4 transition hover:-translate-y-0.5"
-            style={{ borderColor: 'var(--gv-border)' }}
-          >
-            <div className="mb-3 h-[3px] w-full rounded" style={{ backgroundColor: mode.accent }} />
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold text-stone-800">{mode.name}</h2>
-              <span className="rounded-full bg-stone-100 px-2 py-1 text-xs text-stone-600">{mode.status}</span>
-            </div>
-            <p className="mt-2 text-sm text-stone-600">{mode.description}</p>
-          </Link>
-        ))}
-      </section>
-
-      <section className="mt-6 rounded-2xl border bg-white p-4" style={{ borderColor: 'var(--gv-border)' }}>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">Stats summary</h2>
+      <section className="mt-6 gv-sticker-card p-5">
+        <h2 className="gv-label">Stats summary</h2>
         {!isReady ? (
-          <p className="mt-2 text-sm text-stone-500">Loading stats...</p>
+          <p className="mt-2 text-sm text-[var(--text-muted)]">Loading stats...</p>
         ) : (
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg bg-stone-50 px-3 py-2">
-              <p className="text-xs text-stone-500">Total games</p>
-              <p className="text-lg font-semibold text-stone-800">{summary.totalGamesPlayed}</p>
+            <div className="gv-panel px-3 py-2">
+              <p className="text-xs text-[var(--text-muted)]">Total games</p>
+              <p className="gv-mono text-2xl font-semibold text-[var(--accent)]">{summary.totalGamesPlayed}</p>
             </div>
-            <div className="rounded-lg bg-stone-50 px-3 py-2">
-              <p className="text-xs text-stone-500">Best streak</p>
-              <p className="text-lg font-semibold text-stone-800">{summary.bestStreak}</p>
+            <div className="gv-panel px-3 py-2">
+              <p className="text-xs text-[var(--text-muted)]">Best streak</p>
+              <p className="gv-mono text-2xl font-semibold text-[var(--accent-gold)]">{summary.bestStreak}</p>
             </div>
-            <div className="rounded-lg bg-stone-50 px-3 py-2">
-              <p className="text-xs text-stone-500">Win rate</p>
-              <p className="text-lg font-semibold text-stone-800">{summary.winRate.toFixed(1)}%</p>
+            <div className="gv-panel px-3 py-2">
+              <p className="text-xs text-[var(--text-muted)]">Win rate</p>
+              <p className="gv-mono text-2xl font-semibold text-[var(--accent)]">{summary.winRate.toFixed(1)}%</p>
             </div>
           </div>
         )}
       </section>
 
-      <section className="mt-6 rounded-2xl border bg-white p-4" style={{ borderColor: 'var(--gv-border)' }}>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">Per-mode stats</h2>
+      <section className="mt-4 gv-sticker-card p-5">
+        <h2 className="gv-label">Per-mode stats</h2>
         <ul className="mt-3 space-y-2">
           {modes.map((mode) => {
             const item = stats[mode.mode]
@@ -112,11 +141,10 @@ export default function Home() {
             return (
               <li
                 key={mode.mode}
-                className="flex items-center justify-between rounded-lg border px-3 py-2"
-                style={{ borderColor: 'var(--gv-border)' }}
+                className="gv-panel flex items-center justify-between px-3 py-2"
               >
-                <p className="text-sm font-medium text-stone-700">{mode.name}</p>
-                <p className="text-sm text-stone-600">
+                <p className="text-sm font-medium text-[var(--text-primary)]">{mode.name}</p>
+                <p className="gv-mono text-sm text-[var(--text-muted)]">
                   {item.gamesPlayed} played · {winRate.toFixed(1)}% win
                 </p>
               </li>

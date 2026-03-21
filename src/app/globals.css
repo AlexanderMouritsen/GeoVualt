@@ -1,25 +1,43 @@
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind base;
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind components;
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Syne:wght@500;700;800&display=swap');
+
 :root {
-  --gv-bg: #f9fafb;
-  --gv-surface: #ffffff;
-  --gv-border: #e5e7eb;
-  --gv-text: #292524;
-  --gv-text-muted: #57534e;
-  --gv-primary: #0f6e56;
-  --gv-accent: #ba7517;
-  --gv-geodle: #0f6e56;
-  --gv-georankle: #534ab7;
-  --gv-geoconnections: #ba7517;
-  --gv-geogrid: #185fa5;
+  --bg-base: #0f1923;
+  --bg-surface: #1a2332;
+  --bg-elevated: #1f2e3f;
+  --border: #2a3a4a;
+  --border-bright: #3a5a7a;
+  --text-primary: #f1f0eb;
+  --text-muted: #8896a5;
+  --accent: #0ff0b3;
+  --accent-gold: #d4a853;
+  --accent-danger: #ff6b6b;
+
+  /* Compatibility aliases for existing component styles. */
+  --gv-bg: var(--bg-base);
+  --gv-surface: var(--bg-surface);
+  --gv-border: var(--border);
+  --gv-text: var(--text-primary);
+  --gv-text-muted: var(--text-muted);
+  --gv-primary: var(--accent);
+  --gv-accent: var(--accent-gold);
+  --gv-geodle: #24c8a4;
+  --gv-georankle: #0ff0b3;
+  --gv-geoconnections: #d4a853;
+  --gv-geogrid: #63b3ff;
 }
 
 body {
   margin: 0;
-  color: var(--gv-text);
-  background: var(--gv-bg);
+  color: var(--text-primary);
+  background: var(--bg-base);
+  font-family: 'Space Grotesk', 'Syne', sans-serif;
 }
 
 a {
@@ -29,4 +47,94 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Syne', 'Space Grotesk', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.gv-label {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.gv-sticker-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-surface);
+}
+
+.gv-nav-link {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--text-muted);
+  transition: color 140ms ease;
+}
+
+.gv-nav-link:hover {
+  color: var(--accent);
+}
+
+.gv-daily-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-height: 190px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--bg-surface);
+  transition: background-color 130ms ease, border-color 130ms ease, transform 130ms ease;
+}
+
+.gv-daily-card:hover {
+  transform: translateY(-1px);
+  background: var(--bg-elevated);
+  border-color: var(--border-bright);
+}
+
+.gv-mono {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.gv-panel {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-surface);
+}
+
+.gv-btn-outline {
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  background: transparent;
+  font-weight: 600;
+}
+
+.gv-btn-outline:disabled {
+  opacity: 0.45;
+}
+
+.gv-rule {
+  border-bottom: 1px solid var(--border);
+}
+
+.gv-game-number {
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent);
 }
