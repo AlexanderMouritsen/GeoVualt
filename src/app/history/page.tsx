@@ -5,11 +5,11 @@ import { challengeDateFromNumber, getChallengeNumber, getTodayIso } from '@/lib/
 const MAX_ROWS = 30
 
 const gameLinks = [
-  { href: '/geodle', name: 'Geodle' },
-  { href: '/georankle', name: 'GeoRankle (World)' },
-  { href: '/georankle-europe', name: 'GeoRankle (Europe)' },
-  { href: '/geoconnections', name: 'GeoConnections' },
-  { href: '/geogrid', name: 'GeoGrid' },
+  { href: '/hidden-country', name: 'Border Hunt' },
+  { href: '/country-rank', name: 'Country Rank (World)' },
+  { href: '/country-rank-europe', name: 'Country Rank (Europe)' },
+  { href: '/nation-match', name: 'Nation Links' },
+  { href: '/country-matrix', name: 'Country Matrix' },
 ]
 
 export default function HistoryPage() {

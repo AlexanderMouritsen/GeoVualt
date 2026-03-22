@@ -10,9 +10,9 @@ export default function Home() {
 
   const modes = [
     {
-      href: '/georankle',
+      href: '/country-rank',
       mode: 'georankle' as GameMode,
-      name: 'GeoRankle',
+      name: 'Country Rank',
       description: 'Pick the metric where a country ranks highest globally.',
       color: 'var(--gv-georankle)',
       status: 'Daily',
@@ -28,10 +28,10 @@ export default function Home() {
       ),
     },
     {
-      href: '/geodle',
+      href: '/hidden-country',
       mode: 'geodle' as GameMode,
-      name: 'Geodle',
-      description: 'Guess the mystery country with unlimited tries and structured feedback.',
+      name: 'Border Hunt',
+      description: 'Find the hidden country with unlimited tries and structured feedback.',
       color: 'var(--gv-geodle)',
       status: 'Daily',
       icon: (
@@ -43,10 +43,10 @@ export default function Home() {
       ),
     },
     {
-      href: '/geoconnections',
+      href: '/nation-match',
       mode: 'geoconnections' as GameMode,
-      name: 'GeoConnections',
-      description: 'Solve groups of tiles that belong to the same country.',
+      name: 'Nation Links',
+      description: 'Solve sets of tiles that belong to the same country.',
       color: 'var(--gv-geoconnections)',
       status: 'Daily',
       icon: (
@@ -59,10 +59,10 @@ export default function Home() {
       ),
     },
     {
-      href: '/geogrid',
+      href: '/country-matrix',
       mode: 'geogrid' as GameMode,
-      name: 'GeoGrid',
-      description: 'Fill a 3x3 category grid with rare and valid countries.',
+      name: 'Country Matrix',
+      description: 'Fill a 3x3 category matrix with rare and valid countries.',
       color: 'var(--gv-geogrid)',
       status: 'Bonus',
       icon: (

@@ -5,19 +5,18 @@
 /* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Syne:wght@500;700;800&display=swap');
-
 :root {
-  --bg-base: #0f1923;
-  --bg-surface: #1a2332;
-  --bg-elevated: #1f2e3f;
-  --border: #2a3a4a;
-  --border-bright: #3a5a7a;
-  --text-primary: #f1f0eb;
-  --text-muted: #8896a5;
-  --accent: #0ff0b3;
-  --accent-gold: #d4a853;
-  --accent-danger: #ff6b6b;
+  --bg-base: #f6efe3;
+  --bg-surface: #fff8ee;
+  --bg-elevated: #efe3d2;
+  --border: #d8c7ac;
+  --border-bright: #b9a181;
+  --text-primary: #2f2417;
+  --text-muted: #7d6b52;
+  --accent: #7a5a35;
+  --accent-gold: #b48848;
+  --accent-danger: #b74f4b;
+  --accent-success: #4a9d6f;
 
   /* Compatibility aliases for existing component styles. */
   --gv-bg: var(--bg-base);
@@ -27,17 +26,17 @@
   --gv-text-muted: var(--text-muted);
   --gv-primary: var(--accent);
   --gv-accent: var(--accent-gold);
-  --gv-geodle: #24c8a4;
-  --gv-georankle: #0ff0b3;
-  --gv-geoconnections: #d4a853;
-  --gv-geogrid: #63b3ff;
+  --gv-geodle: #8e7a56;
+  --gv-georankle: #7a5a35;
+  --gv-geoconnections: #b48848;
+  --gv-geogrid: #7f9272;
 }
 
 body {
   margin: 0;
   color: var(--text-primary);
   background: var(--bg-base);
-  font-family: 'Space Grotesk', 'Syne', sans-serif;
+  font-family: var(--font-lora), Georgia, serif;
 }
 
 a {
@@ -52,15 +51,15 @@ a {
 h1,
 h2,
 h3 {
-  font-family: 'Syne', 'Space Grotesk', sans-serif;
-  letter-spacing: -0.01em;
+  font-family: inherit;
+  letter-spacing: 0;
 }
 
 button,
 input,
 select,
 textarea {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: inherit;
 }
 
 .gv-label {
@@ -109,7 +108,7 @@ textarea {
 }
 
 .gv-mono {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
 }
 
 .gv-panel {
@@ -135,6 +134,6 @@ textarea {
 }
 
 .gv-game-number {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: inherit;
   color: var(--accent);
 }

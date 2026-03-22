@@ -1,5 +1,5 @@
-import { GeoRankleGame } from '@/components/game/GeoRankleGame'
+import { redirect } from 'next/navigation'
 
-export default function GeoRankleEuropePage() {
-  return <GeoRankleGame scope="europe" />
+export default function LegacyGeoRankleEuropePage() {
+  redirect('/country-rank-europe')
 }

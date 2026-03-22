@@ -1,6 +1,15 @@
 import type { Metadata } from 'next'
+import { Lora } from 'next/font/google'
 import Link from 'next/link'
+import { BetaNoticeModal } from '@/components/BetaNoticeModal'
 import './globals.css'
+
+const lora = Lora({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-lora',
+})
 
 export const metadata: Metadata = {
   title: 'GeoVault',
@@ -13,8 +22,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={lora.variable}>
       <body>
+        <BetaNoticeModal />
         <header className="border-b border-[var(--border)] bg-[var(--bg-base)]">
           <nav className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-6 px-6 py-4">
             <div className="flex items-center gap-3">
@@ -24,10 +34,10 @@ export default function RootLayout({
             </div>
 
             <div className="hidden items-center gap-8 lg:flex">
-              <Link href="/georankle" className="gv-nav-link">GeoRankle</Link>
-              <Link href="/geodle" className="gv-nav-link">Geodle</Link>
-              <Link href="/geoconnections" className="gv-nav-link">GeoConnections</Link>
-              <Link href="/geogrid" className="gv-nav-link">GeoGrid</Link>
+              <Link href="/country-rank" className="gv-nav-link">Country Rank</Link>
+              <Link href="/hidden-country" className="gv-nav-link">Border Hunt</Link>
+              <Link href="/nation-match" className="gv-nav-link">Nation Links</Link>
+              <Link href="/country-matrix" className="gv-nav-link">Country Matrix</Link>
               <Link href="/history" className="gv-nav-link">History</Link>
             </div>
 

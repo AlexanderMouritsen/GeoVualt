@@ -19,6 +19,36 @@ const TOTAL_ROUNDS = 8
 const MIN_ROUNDS = 4
 const AUTO_ADVANCE_MS = 800
 
+function dailyLockKey(scope: 'world' | 'europe'): string {
+  return `geovault-georankle-daily-completed:${scope}`
+}
+
+function gameStateKey(scope: 'world' | 'europe', challengeDate: string): string {
+  return `geovault-georankle-game-state:${scope}:${challengeDate}`
+}
+
+interface SavedGeoRankleState {
+  metricPool: MetricKey[]
+  selections: RoundSelection[]
+}
+
+function saveGameState(scope: 'world' | 'europe', challengeDate: string, state: SavedGeoRankleState): void {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(gameStateKey(scope, challengeDate), JSON.stringify(state))
+}
+
+function loadGameState(scope: 'world' | 'europe', challengeDate: string): SavedGeoRankleState | null {
+  if (typeof window === 'undefined') return null
+  const raw = window.localStorage.getItem(gameStateKey(scope, challengeDate))
+  if (!raw) return null
+
+  try {
+    return JSON.parse(raw) as SavedGeoRankleState
+  } catch {
+    return null
+  }
+}
+
 interface GeoRankleRound {
   country: Country
 }
@@ -171,6 +201,8 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [didRecordResult, setDidRecordResult] = useState(false)
+  const [dailyCompletedDate, setDailyCompletedDate] = useState<string | null>(null)
+  const [showDailyLockModal, setShowDailyLockModal] = useState(false)
   const [challengeDate, setChallengeDate] = useState(() => normalizeChallengeDate(null))
 
   const { recordResult } = useStats()
@@ -180,6 +212,12 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
     const params = new URLSearchParams(window.location.search)
     setChallengeDate(normalizeChallengeDate(params.get('day')))
   }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const stored = window.localStorage.getItem(dailyLockKey(scope))
+    setDailyCompletedDate(stored)
+  }, [scope])
 
   useEffect(() => {
     let cancelled = false
@@ -230,6 +268,7 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
 
   const currentRound = rounds[roundIndex]
   const currentSelection = selections[roundIndex]
+  const dailyAlreadyCompleted = seedMode === 'daily' && dailyCompletedDate === challengeDate
   const isFinished = rounds.length > 0 && roundIndex >= rounds.length
   const answeredRounds = selections.length
   const totalScore = selections.reduce((sum, selection) => sum + selection.points, 0)
@@ -260,11 +299,53 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
     if (!isFinished || didRecordResult) return
 
     recordResult('georankle', true)
+    if (seedMode === 'daily' && typeof window !== 'undefined') {
+      window.localStorage.setItem(dailyLockKey(scope), challengeDate)
+      saveGameState(scope, challengeDate, {
+        metricPool,
+        selections,
+      })
+      setDailyCompletedDate(challengeDate)
+    }
     setDidRecordResult(true)
-  }, [didRecordResult, isFinished, recordResult])
+  }, [challengeDate, didRecordResult, isFinished, metricPool, recordResult, scope, seedMode, selections])
+
+  useEffect(() => {
+    if (!dailyAlreadyCompleted || rounds.length === 0) return
+
+    const saved = loadGameState(scope, challengeDate)
+    if (saved?.selections?.length) {
+      setSelections(saved.selections)
+    }
+
+    if (saved?.metricPool?.length === metricPool.length && saved.metricPool.length > 0) {
+      setMetricPool(saved.metricPool)
+    }
+
+    setRoundIndex(rounds.length)
+  }, [challengeDate, dailyAlreadyCompleted, metricPool.length, rounds.length, scope])
+
+  useEffect(() => {
+    setShowDailyLockModal(dailyAlreadyCompleted)
+  }, [dailyAlreadyCompleted])
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (!showDailyLockModal) return
+
+    const previousBodyOverflow = document.body.style.overflow
+    const previousHtmlOverflow = document.documentElement.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow
+      document.documentElement.style.overflow = previousHtmlOverflow
+    }
+  }, [showDailyLockModal])
 
   const pickMetric = (metric: MetricKey) => {
-    if (!currentRound || currentSelection || isFinished) return
+    if (dailyAlreadyCompleted || !currentRound || currentSelection || isFinished) return
     if (usedMetrics.has(metric)) return
 
     const rank = rankForMetric(currentRound.country, metric, temperatureRanksByCca2)
@@ -315,25 +396,26 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
 
   return (
     <GameShell
-      title={isEurope ? 'GeoRankle Europe' : 'GeoRankle'}
+      title={isEurope ? 'Country Rank Europe' : 'Country Rank'}
       accent="var(--gv-georankle)"
       accentLight="var(--bg-base)"
       launchKey={`${scope}-${seedMode}-${challengeDate}`}
       challengeScope={scopeLabel}
       challengeDate={challengeDate}
+      autoStart={dailyAlreadyCompleted}
       headerRight={
         <div className="flex flex-wrap items-end gap-3 text-xs">
           <div className="rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-2 py-1.5">
             <p className="gv-label">Region</p>
             <div className="mt-1 flex items-center gap-1">
               <Link
-                href="/georankle"
+                href="/country-rank"
                 className={`rounded-md border px-2 py-1 ${!isEurope ? 'border-[var(--accent)] text-[var(--accent)]' : 'border-[var(--border)] text-[var(--text-muted)]'}`}
               >
                 World
               </Link>
               <Link
-                href="/georankle-europe"
+                href="/country-rank-europe"
                 className={`rounded-md border px-2 py-1 ${isEurope ? 'border-[var(--accent)] text-[var(--accent)]' : 'border-[var(--border)] text-[var(--text-muted)]'}`}
               >
                 Europe
@@ -484,14 +566,53 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
             ))}
           </div>
 
-          <button
-            type="button"
-            onClick={restartGame}
-            className="mx-auto w-full max-w-[520px] rounded-md bg-[var(--accent)] px-5 py-3 text-sm font-bold text-[var(--bg-base)]"
-          >
-            Play again
-          </button>
+          <div className="flex justify-center px-4">
+            {seedMode === 'unlimited' ? (
+              <button
+                type="button"
+                onClick={restartGame}
+                className="w-full max-w-[520px] rounded-md bg-[var(--accent)] px-5 py-3 font-bold text-[var(--bg-base)]"
+              >
+                Play again
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setSeedMode('unlimited')}
+                className="w-full max-w-[520px] rounded-md bg-[var(--accent)] px-5 py-3 font-bold text-[var(--bg-base)]"
+              >
+                Switch to Unlimited
+              </button>
+            )}
+          </div>
         </section>
+      ) : null}
+
+      {showDailyLockModal ? (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/45 px-4">
+          <div className="gv-panel relative w-full max-w-[520px] p-5 text-center">
+            <button
+              type="button"
+              onClick={() => setShowDailyLockModal(false)}
+              className="absolute right-3 top-3 rounded border border-[var(--border)] px-2 py-0.5 text-xs text-[var(--text-muted)]"
+              aria-label="Close"
+            >
+              x
+            </button>
+            <p className="text-lg font-semibold text-[var(--text-primary)]">Daily puzzle already solved</p>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">You already completed today&apos;s {isEurope ? 'GeoRankle Europe' : 'GeoRankle'} challenge.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setSeedMode('unlimited')
+                setShowDailyLockModal(false)
+              }}
+              className="mt-4 w-full rounded-md bg-[var(--accent)] px-5 py-3 font-bold text-[var(--bg-base)]"
+            >
+              Switch to Unlimited
+            </button>
+          </div>
+        </div>
       ) : null}
     </GameShell>
   )
