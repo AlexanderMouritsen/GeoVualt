@@ -276,7 +276,12 @@ function applySupplementalMetrics(countryMap) {
 		for (const [cca2, raw] of Object.entries(byCountry)) {
 			const country = countryMap.get(cca2)
 			if (!country) continue
-			country[metric] = safeNumber(raw)
+			const value = safeNumber(raw)
+			if (value === null) continue
+			// Supplemental values are fallback only: keep upstream indicator values when present.
+			if (safeNumber(country[metric]) === null) {
+				country[metric] = value
+			}
 		}
 	}
 }
@@ -428,7 +433,7 @@ async function main() {
 	console.log(`Loaded ${countryMap.size} base countries`)
 	console.log('Applying World Bank indicators...')
 	await applyWorldBankIndicators(countryMap)
-	console.log('Applying supplemental hardcoded metrics...')
+	console.log('Applying supplemental fallback metrics...')
 	applySupplementalMetrics(countryMap)
 
 	const countries = Array.from(countryMap.values()).sort((a, b) => a.name.localeCompare(b.name))

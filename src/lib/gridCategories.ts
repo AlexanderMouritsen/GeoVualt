@@ -205,7 +205,6 @@ export function buildGridCategories(countries: Country[]): GridCategory[] {
     { id: 'metric-internet-85', label: 'Internet users > 85%', min: 85, getter: (c) => c.internetUsersPercent, minCountries: 8 },
     { id: 'metric-forest-40', label: 'Forest area > 40%', min: 40, getter: (c) => c.forestAreaPercent, minCountries: 8 },
     { id: 'metric-temp-20', label: 'Avg temp > 20°C', min: 20, getter: (c) => comparableTemperature(c), minCountries: 8 },
-    { id: 'metric-tourism-10m', label: 'Tourism arrivals > 10M', min: 10_000_000, getter: (c) => c.tourismArrivals, minCountries: 8 },
   ]
 
   for (const metric of metricGtDefinitions) {
@@ -248,7 +247,6 @@ export function buildGridCategories(countries: Country[]): GridCategory[] {
   topByNullable('gdpUsd', 'Top 25 by GDP', 25)
   topByNullable('lifeExpectancy', 'Top 25 by life expectancy', 25)
   topByNullable('internetUsersPercent', 'Top 25 by internet use', 25)
-  topByNullable('tourismArrivals', 'Top 25 by tourism arrivals', 25)
 
   const byLanguage = new Map<string, string[]>()
   for (const country of countries) {

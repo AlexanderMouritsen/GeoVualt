@@ -15,6 +15,7 @@ interface GameShellProps {
   launchKey?: string
   challengeScope?: string
   challengeDate?: string
+  autoStart?: boolean
 }
 
 export function GameShell({
@@ -26,8 +27,9 @@ export function GameShell({
   launchKey,
   challengeScope = 'World',
   challengeDate,
+  autoStart = false,
 }: GameShellProps) {
-  const [hasStarted, setHasStarted] = useState(false)
+  const [hasStarted, setHasStarted] = useState(() => Boolean(autoStart))
   const effectiveChallengeDate = useMemo(
     () => normalizeChallengeDate(challengeDate ?? getTodayIso()),
     [challengeDate],
@@ -35,8 +37,8 @@ export function GameShell({
   const challengeNumber = useMemo(() => getChallengeNumber(effectiveChallengeDate), [effectiveChallengeDate])
 
   useEffect(() => {
-    setHasStarted(false)
-  }, [launchKey])
+    setHasStarted(Boolean(autoStart))
+  }, [autoStart, launchKey])
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-[1200px] px-6 py-7">
