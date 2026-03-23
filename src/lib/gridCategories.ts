@@ -178,9 +178,9 @@ export function buildGridCategories(countries: Country[]): GridCategory[] {
   const pop100m = countries.filter((country) => country.population > 100_000_000).map((country) => country.cca2)
   const area1m = countries.filter((country) => country.area > 1_000_000).map((country) => country.cca2)
 
-  addCategory(categories, 'metric-gt-pop-50m', 'metric_gt', 'Population > 50M', pop50m, 10)
-  addCategory(categories, 'metric-gt-pop-100m', 'metric_gt', 'Population > 100M', pop100m, 8)
-  addCategory(categories, 'metric-gt-area-1m', 'metric_gt', 'Area > 1M km²', area1m, 8)
+  addCategory(categories, 'metric-gt-pop-50m', 'metric_gt', 'Population 50M or higher', pop50m, 10)
+  addCategory(categories, 'metric-gt-pop-100m', 'metric_gt', 'Population 100M or higher', pop100m, 8)
+  addCategory(categories, 'metric-gt-area-1m', 'metric_gt', 'Area 1M km² or higher', area1m, 8)
   addCategory(
     categories,
     'metric-range-pop-20-80m',
@@ -194,17 +194,17 @@ export function buildGridCategories(countries: Country[]): GridCategory[] {
     categories,
     'metric-lt-area-100k',
     'metric_lt',
-    'Area < 100k km²',
+    'Area less than 100k km²',
     countries.filter((country) => country.area < 100_000).map((country) => country.cca2),
     10,
   )
 
   const metricGtDefinitions: Array<{ id: string; label: string; min: number; getter: (c: Country) => number | null; minCountries: number }> = [
-    { id: 'metric-gdp-500b', label: 'GDP > $500B', min: 500_000_000_000, getter: (c) => c.gdpUsd, minCountries: 8 },
-    { id: 'metric-lifeexp-80', label: 'Life expectancy > 80', min: 80, getter: (c) => c.lifeExpectancy, minCountries: 8 },
-    { id: 'metric-internet-85', label: 'Internet users > 85%', min: 85, getter: (c) => c.internetUsersPercent, minCountries: 8 },
-    { id: 'metric-forest-40', label: 'Forest area > 40%', min: 40, getter: (c) => c.forestAreaPercent, minCountries: 8 },
-    { id: 'metric-temp-20', label: 'Avg temp > 20°C', min: 20, getter: (c) => comparableTemperature(c), minCountries: 8 },
+    { id: 'metric-gdp-500b', label: 'GDP $500B or higher', min: 500_000_000_000, getter: (c) => c.gdpUsd, minCountries: 8 },
+    { id: 'metric-lifeexp-80', label: 'Life expectancy 80 years or higher', min: 80, getter: (c) => c.lifeExpectancy, minCountries: 8 },
+    { id: 'metric-internet-85', label: 'Internet users 85% or higher', min: 85, getter: (c) => c.internetUsersPercent, minCountries: 8 },
+    { id: 'metric-forest-40', label: 'Forest area 40% or higher', min: 40, getter: (c) => c.forestAreaPercent, minCountries: 8 },
+    { id: 'metric-temp-20', label: 'Avg temp 20°C or higher', min: 20, getter: (c) => comparableTemperature(c), minCountries: 8 },
   ]
 
   for (const metric of metricGtDefinitions) {
@@ -216,7 +216,7 @@ export function buildGridCategories(countries: Country[]): GridCategory[] {
       countries
         .filter((country) => {
           const value = metric.getter(country)
-          return typeof value === 'number' && value > metric.min
+          return typeof value === 'number' && value >= metric.min
         })
         .map((country) => country.cca2),
       metric.minCountries,

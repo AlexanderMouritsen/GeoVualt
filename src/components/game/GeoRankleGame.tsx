@@ -19,6 +19,17 @@ const TOTAL_ROUNDS = 8
 const MIN_ROUNDS = 4
 const AUTO_ADVANCE_MS = 800
 
+// Metrics with insufficient coverage for reliable gameplay
+const LOW_COVERAGE_METRICS: MetricKey[] = [
+	'co2EmissionsPerCapita',
+	'incarcerationRatePer100k',
+	'happinessScore',
+	'literacyRatePercent',
+	'oilProductionBarrelsPerDay',
+	'goldReservesTonnes',
+	'avgTemperatureCelsius',
+]
+
 function dailyLockKey(scope: 'world' | 'europe'): string {
   return `geovault-georankle-daily-completed:${scope}`
 }
@@ -105,12 +116,19 @@ function rankForMetric(
   country: Country,
   metric: MetricKey,
   temperatureRanksByCca2: Map<string, number>,
+  scopeRankingsByCca2: Map<string, Partial<Record<MetricKey, number>>>,
 ): number {
-  const direct = country.rankings[metric]
-  if (typeof direct === 'number') return direct
+  // Use scope-specific ranking if available
+  const scopeRanks = scopeRankingsByCca2.get(country.cca2)
+  if (scopeRanks && typeof scopeRanks[metric] === 'number') {
+    return scopeRanks[metric]
+  }
+  
+  // Temperature uses the pre-computed temperature ranks
   if (metric === 'avgTemperatureCelsius') {
     return temperatureRanksByCca2.get(country.cca2) ?? 999
   }
+  
   return 999
 }
 
@@ -122,6 +140,7 @@ function pickMetricPool(countries: Country[], rng: () => number): MetricKey[] {
       difficulty: definition.difficulty,
     }))
     .filter((item) => item.coverage >= MIN_ROUNDS)
+    .filter((item) => !LOW_COVERAGE_METRICS.includes(item.key))
 
   if (candidates.length < TOTAL_ROUNDS) {
     throw new Error('Not enough metrics with usable coverage to build a full GeoRankle game')
@@ -154,9 +173,14 @@ function pickMetricPool(countries: Country[], rng: () => number): MetricKey[] {
   return selected.slice(0, TOTAL_ROUNDS)
 }
 
-function bestMetricForCountry(country: Country, metrics: MetricKey[]): MetricKey | null {
+function bestMetricForCountry(
+  country: Country,
+  metrics: MetricKey[],
+  scopeRankingsByCca2: Map<string, Partial<Record<MetricKey, number>>>,
+): MetricKey | null {
+  const scopeRanks = scopeRankingsByCca2.get(country.cca2) ?? {}
   const ranked = metrics
-    .map((metric) => ({ metric, rank: country.rankings[metric] ?? 999 }))
+    .map((metric) => ({ metric, rank: scopeRanks[metric] ?? country.rankings[metric] ?? 999 }))
     .sort((a, b) => a.rank - b.rank)
 
   if (ranked.length === 0 || ranked[0].rank === 999) {
@@ -280,6 +304,39 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
 
     return new Map(sorted.map((item, index) => [item.country.cca2, index + 1]))
   }, [countries])
+
+  // Compute scope-specific rankings for all metrics
+  const scopeRankingsByCca2 = useMemo(() => {
+    const rankMap = new Map<string, Partial<Record<MetricKey, number>>>()
+
+    // For each metric in the metric definitions, compute scope-specific ranks
+    for (const definition of METRIC_DEFINITIONS) {
+      const metricKey = definition.key as MetricKey
+      
+      // Filter countries that have non-null values for this metric
+      const withValues = countries
+        .filter((country) => {
+          const value = country[metricKey]
+          return value !== null && value !== undefined
+        })
+        .sort((a, b) => {
+          // Sort descending (highest value = best rank = #1)
+          const aVal = (a[metricKey] ?? 0) as number
+          const bVal = (b[metricKey] ?? 0) as number
+          return bVal - aVal
+        })
+
+      // Assign 1-based ranks
+      for (let i = 0; i < withValues.length; i++) {
+        const country = withValues[i]
+        const existing = rankMap.get(country.cca2) ?? {}
+        existing[metricKey] = i + 1
+        rankMap.set(country.cca2, existing)
+      }
+    }
+
+    return rankMap
+  }, [countries])
   const usedMetrics = new Set(selections.map((selection) => selection.metric))
   const previousSelectionsByMetric = new Map<MetricKey, { roundIndex: number; rank: number }>()
   selections.slice(0, roundIndex).forEach((selection, idx) => {
@@ -348,7 +405,7 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
     if (dailyAlreadyCompleted || !currentRound || currentSelection || isFinished) return
     if (usedMetrics.has(metric)) return
 
-    const rank = rankForMetric(currentRound.country, metric, temperatureRanksByCca2)
+    const rank = rankForMetric(currentRound.country, metric, temperatureRanksByCca2, scopeRankingsByCca2)
     const points = rankToPoints(rank)
     setSelections((prev) => {
       const next = [...prev]
@@ -375,11 +432,18 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
 
     return rounds.map((round, idx) => {
       const availableAtRound = metricPool.filter((metric) => !usedBeforeRound.has(metric))
-      const bestMetric = bestMetricForCountry(round.country, availableAtRound)
+      const bestMetric = bestMetricForCountry(round.country, availableAtRound, scopeRankingsByCca2)
       const picked = selections[idx]
 
       if (picked?.metric) {
         usedBeforeRound.add(picked.metric)
+      }
+
+      // Use scope-specific rank if available, otherwise use global rank
+      let bestRank: number | null = null
+      if (bestMetric) {
+        const scopeRanks = scopeRankingsByCca2.get(round.country.cca2)
+        bestRank = scopeRanks?.[bestMetric] ?? round.country.rankings[bestMetric] ?? 999
       }
 
       return {
@@ -389,10 +453,10 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
         pickedRank: picked?.rank,
         pickedPoints: picked?.points,
         bestMetric,
-        bestRank: bestMetric ? (round.country.rankings[bestMetric] ?? 999) : null,
+        bestRank,
       }
     })
-  }, [metricPool, rounds, selections])
+  }, [metricPool, rounds, selections, scopeRankingsByCca2])
 
   return (
     <GameShell
@@ -474,7 +538,7 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
               const definition = getMetricDefinition(metricKey)
               const isChosen = currentSelection?.metric === metricKey
               const previousPick = previousSelectionsByMetric.get(metricKey)
-              const rank = rankForMetric(currentRound.country, metricKey, temperatureRanksByCca2)
+              const rank = rankForMetric(currentRound.country, metricKey, temperatureRanksByCca2, scopeRankingsByCca2)
               const icon = METRIC_ICON[metricKey] ?? '📌'
               const isLocked = Boolean(previousPick)
               const isDisabled = Boolean(currentSelection) || isLocked
