@@ -46,7 +46,23 @@ const SUPPLEMENTAL_METRICS = {
 		TH: 27.5, ID: 26.7, PH: 26.6, VN: 23.8, MY: 27.1, SG: 26.8, TW: 22.6, CN: 8.2, PK: 25.6, BD: 25.8,
 		CL: 12.0, AR: 16.5, PE: 18.2, CO: 24.3, EC: 25.0, VE: 26.8, TR: 11.0, IR: 16.4, SA: 26.1, AE: 28.0,
 		KW: 26.5, QA: 28.6, OM: 28.2, JO: 18.1, LB: 17.0, IL: 18.5, GR: 15.4, PT: 13.7, PL: 7.7, UA: 6.8,
-		RO: 8.4, BG: 9.6, HU: 9.5, CZ: 7.9, SK: 8.3, HR: 9.9, SB: 9.1,
+		RO: 8.4, BG: 9.6, HU: 9.5, CZ: 7.9, SK: 8.3, HR: 9.9, SB: 26.0,
+		// Europe
+		FI: 2.5, IE: 9.0, NL: 9.5, BE: 9.3, AT: 8.2, CH: 9.0, LU: 9.2, MT: 18.5, CY: 18.0, AL: 12.0,
+		ME: 11.0, RS: 10.5, BA: 8.5, MK: 9.5, BY: 5.5, MD: 9.0,
+		// Asia
+		KZ: 10.0, UZ: 17.0, TJ: 14.0, KG: 12.0, TM: 18.0, AZ: 15.0, GE: 12.0, AM: 11.0,
+		NP: 19.0, LK: 27.0, MM: 27.0, KH: 27.0, LA: 25.5, BN: 27.0, TL: 26.0,
+		// Africa
+		NG: 26.0, GH: 26.0, KE: 21.0, TZ: 21.0, UG: 21.0, ZM: 21.0, ZW: 19.0, MW: 21.0, MZ: 22.0,
+		DZ: 20.0, MA: 18.0, TN: 19.0, SD: 27.0, ET: 17.0, CM: 25.0, AO: 20.0, CG: 23.0, CD: 24.0,
+		RW: 19.0, BI: 20.0, BJ: 27.0, BF: 28.0, ML: 28.5, NE: 29.0, LR: 26.0, SL: 26.5, SN: 28.0,
+		MR: 26.0, DJ: 28.0, KM: 25.0, MG: 20.0, MU: 23.5,
+		// Americas
+		CR: 26.0, PA: 27.0, JM: 26.5, DO: 25.5, HT: 24.5, CU: 25.5, BZ: 26.0, SV: 26.0, HN: 26.0,
+		GT: 22.0, NI: 26.0, PY: 24.0, UY: 16.5, BO: 22.0, SR: 26.5, GY: 26.0, BS: 25.0, TT: 25.5,
+		// Caribbean & Small Islands
+		FJ: 25.0, WS: 25.5, KI: 27.0, MH: 27.0, NR: 27.5, PW: 27.0, TO: 25.0, VU: 25.5,
 	},
 	happinessScore: {
 		FI: 7.8, DK: 7.6, IS: 7.5, SE: 7.3, NO: 7.3, NL: 7.4, CH: 7.1, AU: 7.0, CA: 6.9, US: 6.7,
@@ -100,7 +116,7 @@ const SUPPLEMENTAL_METRICS = {
 		JP: 84, CH: 84, IT: 83, ES: 83, SG: 83, KR: 82, AU: 82, NO: 82, FR: 82, CA: 82, NZ: 81, GB: 81, DE: 81, SE: 81, IS: 82,
 		US: 78, BR: 76, RU: 72, MX: 72, TR: 77, CN: 77, IN: 68, PK: 67, BD: 72, TH: 75, MY: 75, VN: 73, ID: 72, PH: 72, ZA: 60,
 		CL: 80, AR: 76, PE: 74, CO: 75, VE: 71, CZ: 79, PL: 78, RO: 76, HR: 77, BG: 75, AT: 81, FI: 81, DK: 81, GR: 81, PT: 80,
-		EG: 71, NG: 54, KE: 66, GH: 63, UA: 71, IR: 74, SA: 75, AE: 78, JO: 74, IL: 82, KW: 75,
+		EG: 71, NG: 54, KE: 66, GH: 63, UA: 71, IR: 74, SA: 75, AE: 78, JO: 74, IL: 82, KW: 75, NL: 82,
 	},
 	literacyRatePercent: {
 		US: 99, CA: 99, AU: 99, GB: 99, DE: 99, FR: 99, JP: 99, SG: 99, KR: 99, NZ: 99,
@@ -118,7 +134,7 @@ const SUPPLEMENTAL_METRICS = {
 	co2EmissionsPerCapita: {
 		US: 16, RU: 16, JP: 9, DE: 8, GB: 5, FR: 4, BR: 2, MX: 4, CA: 15, AU: 16, IN: 2, CN: 8, KR: 13, SG: 10, AE: 24, SA: 16,
 		TR: 4, IT: 6, ES: 5, PL: 8, NL: 11, SE: 4, NO: 12, CH: 5, CZ: 10, ID: 2, TH: 4, VN: 2, MY: 8, PH: 1, PK: 1,
-		CL: 5, AR: 3, PE: 2, CO: 2, AT: 8, BE: 10, DK: 7, FI: 9, GR: 6, PT: 5, RO: 4, BG: 5, HU: 5, CZ: 10, UA: 6, IR: 8, EG: 2, NG: 0.6,
+		CL: 5, AR: 3, PE: 2, CO: 2, AT: 8, BE: 10, DK: 7, FI: 9, GR: 6, PT: 5, RO: 4, BG: 5, HU: 5, CZ: 10, UA: 6, IR: 8, EG: 2, NG: 0.6, VE: 4,
 	},
 	renewableEnergyPercent: {
 		NO: 97, IS: 86, SE: 60, BR: 65, CA: 62, NZ: 68, AU: 28, AT: 50, CH: 63, DK: 52, FI: 51, DE: 44, ES: 36, IT: 35, FR: 50,
@@ -152,7 +168,6 @@ const RANK_METRICS = [
 	'gdpUsd',
 	'gdpPerCapitaUsd',
 	'lifeExpectancy',
-	'humanDevelopmentIndex',
 	'avgTemperatureCelsius',
 	'forestAreaPercent',
 	'co2EmissionsPerCapita',
@@ -165,6 +180,17 @@ const RANK_METRICS = [
 	'oilProductionBarrelsPerDay',
 	'goldReservesTonnes',
 	'militaryExpenditureGdpPercent',
+]
+
+// Metrics with low coverage that should not appear in game rotation
+const LOW_COVERAGE_METRICS = [
+	'co2EmissionsPerCapita',
+	'incarcerationRatePer100k',
+	'happinessScore',
+	'literacyRatePercent',
+	'oilProductionBarrelsPerDay',
+	'goldReservesTonnes',
+	'avgTemperatureCelsius', // 146 countries - borderline
 ]
 
 const COVERAGE_WARNING_THRESHOLD = 120
@@ -252,7 +278,6 @@ function toCountryBase(entry) {
 		gdpUsd: null,
 		gdpPerCapitaUsd: null,
 		lifeExpectancy: null,
-		humanDevelopmentIndex: null,
 		avgTemperatureCelsius: null,
 		forestAreaPercent: null,
 		co2EmissionsPerCapita: null,
@@ -298,36 +323,84 @@ function computeRankings(countries) {
 	}
 }
 
+async function buildIso3ToIso2Map(countryMap) {
+	const map = new Map()
+	for (const country of countryMap.values()) {
+		if (country.cca3) {
+			map.set(normalizeString(country.cca3).toUpperCase(), country.cca2)
+		}
+	}
+	return map
+}
+
 async function applyWorldBankIndicators(countryMap) {
+	const iso3ToIso2 = await buildIso3ToIso2Map(countryMap)
+	
 	for (const [fieldName, indicatorCode] of Object.entries(WORLD_BANK_INDICATORS)) {
-		const url = `${WORLD_BANK_BASE}/${indicatorCode}?format=json&per_page=300&mrv=5`
 		const label = `World Bank indicator ${indicatorCode}`
 
 		try {
-			const payload = await fetchJson(url, label)
-			const rows = Array.isArray(payload?.[1]) ? payload[1] : []
 			const byCountry = new Map()
+			
+			// Fetch first page to get metadata
+			const firstPageUrl = `${WORLD_BANK_BASE}/${indicatorCode}?format=json&per_page=300&mrv=5&page=1`
+			let metadata
+			try {
+				const firstPageData = await fetchJson(firstPageUrl, label)
+				metadata = firstPageData?.[0]
+			} catch (e) {
+				// If first page fails, skip metric
+				throw new Error(`Failed to fetch first page for ${fieldName}: ${e.message}`)
+			}
+			
+			const totalPages = metadata?.pages ?? 1
+			console.log(`  Fetching ${fieldName}: page 1/${totalPages}`)
 
-			for (const row of rows) {
-				const iso2 = normalizeString(row?.countryiso2code)
-				if (!iso2 || iso2.length !== 2) continue
+			// Fetch all pages
+			for (let page = 1; page <= Math.min(totalPages, 5); page++) {
+				const pageUrl = `${WORLD_BANK_BASE}/${indicatorCode}?format=json&per_page=300&mrv=5&page=${page}`
+				let payload
+				
+				try {
+					payload = await fetchJson(pageUrl, `${label} (page ${page})`)
+				} catch (e) {
+					console.warn(`    Warning: Page ${page} failed, continuing with other pages: ${e.message}`)
+					continue
+				}
+				
+				const rows = Array.isArray(payload?.[1]) ? payload[1] : []
+				
+				for (const row of rows) {
+					const iso3 = normalizeString(row?.countryiso3code)?.toUpperCase()
+					if (!iso3 || iso3.length !== 3) continue
 
-				const bucket = byCountry.get(iso2) ?? []
-				bucket.push(row)
-				byCountry.set(iso2, bucket)
+					const bucket = byCountry.get(iso3) ?? []
+					bucket.push(row)
+					byCountry.set(iso3, bucket)
+				}
+				
+				if (page < totalPages) {
+					console.log(`  Fetching ${fieldName}: page ${page + 1}/${totalPages}`)
+				}
 			}
 
-			for (const [iso2, metricRows] of byCountry.entries()) {
+			// Map ISO-3 codes to ISO-2 codes and apply to countries
+			let appliedCount = 0
+			for (const [iso3, metricRows] of byCountry.entries()) {
+				const iso2 = iso3ToIso2.get(iso3)
+				if (!iso2) continue
+
 				const country = countryMap.get(iso2)
 				if (!country) continue
 
 				const value = pickLatestNonNullValue(metricRows)
 				if (value !== null) {
 					country[fieldName] = value
+					appliedCount++
 				}
 			}
 
-			console.log(`Applied ${fieldName} from ${indicatorCode}`)
+			console.log(`Applied ${fieldName} from ${indicatorCode} (${appliedCount} countries)`)
 		} catch (error) {
 			console.warn(`Skipping ${fieldName}: ${error.message}`)
 		}
@@ -350,12 +423,62 @@ function validateCountries(countries) {
 		'rankings',
 	]
 
+	const metricCounts = {}
+	const errors = []
+
+	for (const metric of RANK_METRICS) {
+		metricCounts[metric] = 0
+	}
+
+	// Phase 1A: Check required fields + count metrics + detect null-ranking corruption
 	for (const country of countries) {
 		for (const field of requiredFields) {
 			if (country[field] === undefined) {
 				throw new Error(`Missing required field ${field} for ${country?.name ?? 'unknown'}`)
 			}
 		}
+
+		// CRITICAL: Check for null metrics with rankings
+		for (const metric of RANK_METRICS) {
+			const value = safeNumber(country[metric])
+			const hasRanking = country.rankings[metric] !== undefined
+			
+			if (value === null && hasRanking) {
+				errors.push(`${country.cca2} has ranking ${country.rankings[metric]} for null metric ${metric}`)
+			}
+			
+			if (value !== null) {
+				metricCounts[metric]++
+			}
+		}
+	}
+
+	// Phase 1B: Check for ranking overflow
+	for (const metric of RANK_METRICS) {
+		const count = metricCounts[metric]
+		for (const country of countries) {
+			const rank = country.rankings[metric]
+			if (rank !== undefined && rank > count) {
+				errors.push(`${country.cca2} has invalid rank ${rank} for ${metric} (only ${count} countries with data)`)
+			}
+		}
+	}
+
+	if (errors.length > 0) {
+		console.error('VALIDATION ERRORS FOUND:')
+		for (const error of errors.slice(0, 20)) {
+			console.error(`  ❌ ${error}`)
+		}
+		if (errors.length > 20) {
+			console.error(`  ... and ${errors.length - 20} more errors`)
+		}
+		throw new Error(`Data validation failed: ${errors.length} error(s) found`)
+	}
+
+	console.log('✅ Data validation passed: no null-valued countries have rankings')
+	console.log('\nMetric Coverage Summary:')
+	for (const metric of RANK_METRICS) {
+		console.log(`  ${metric}: ${metricCounts[metric]} countries`)
 	}
 }
 

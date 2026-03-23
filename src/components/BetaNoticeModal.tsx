@@ -22,8 +22,14 @@ export function BetaNoticeModal() {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4">
-      <div className="gv-panel relative w-full max-w-[600px] p-6 text-center">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4"
+      onClick={() => setIsOpen(false)}
+    >
+      <div 
+        className="gv-panel relative w-full max-w-[600px] p-6 text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           type="button"
           onClick={() => setIsOpen(false)}

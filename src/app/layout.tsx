@@ -44,6 +44,9 @@ export default function RootLayout({
             <div className="flex items-center gap-3 text-sm font-semibold">
               <span className="hidden md:inline text-[var(--text-muted)]">English</span>
               <span className="hidden md:inline text-[var(--text-muted)]">|</span>
+              <Link href="/report-bug" className="gv-nav-link text-xs">
+                Report Bug
+              </Link>
               <Link href="/account" className="gv-btn-outline px-4 py-2 text-sm">
                 Account
               </Link>
