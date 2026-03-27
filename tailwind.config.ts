@@ -9,8 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-lora)', 'Georgia', 'serif'],
-        serif: ['var(--font-lora)', 'Georgia', 'serif'],
+        sans: ['var(--font-ui)', 'Nunito', 'Segoe UI', 'sans-serif'],
+        serif: ['var(--font-ui)', 'Nunito', 'Segoe UI', 'sans-serif'],
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

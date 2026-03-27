@@ -516,7 +516,7 @@ export default function GeoConnectionsPage() {
       ) : null}
 
       {!isLoading && !error ? (
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-4 grid grid-cols-4 gap-2 sm:gap-3">
           {unsolvedTiles.map((tile) => {
             const isSelected = selected.includes(tile.id)
             const isAnimatingTile = animatingTileIds.includes(tile.id)
@@ -527,27 +527,27 @@ export default function GeoConnectionsPage() {
                 type="button"
                 onClick={() => toggleTile(tile.id)}
                 disabled={isAnimatingSolve || isAnimatingWrong}
-                className={`min-h-20 rounded-md border p-2 text-sm text-[var(--text-primary)] transition ${isSelected ? 'border-[var(--accent)] bg-[var(--bg-elevated)]' : 'border-[var(--border)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)]'} ${isAnimatingTile ? 'gc-tile-fly' : ''} ${isWrongTile ? 'gc-tile-wrong' : ''}`}
+                className={`min-h-14 rounded-md border p-1.5 text-xs sm:text-sm text-[var(--text-primary)] transition ${isSelected ? 'border-[var(--accent)] bg-[var(--bg-elevated)]' : 'border-[var(--border)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)]'} ${isAnimatingTile ? 'gc-tile-fly' : ''} ${isWrongTile ? 'gc-tile-wrong' : ''}`}
               >
                 {tile.kind === 'flag' ? (
                   <div className="flex h-full items-center justify-center">
                     <Image
                       src={tile.countryFlagUrl}
                       alt={`${tile.countryName} flag`}
-                      width={44}
-                      height={28}
+                      width={32}
+                      height={20}
                       className="rounded"
                       unoptimized
                     />
                   </div>
                 ) : tile.kind === 'shape' ? (
                   <div className="flex h-full items-center justify-center">
-                    <svg width="46" height="34" viewBox="0 0 46 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                    <svg width="32" height="24" viewBox="0 0 46 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
                       <path
                         d={outlinePathByCca2.get(tile.countryCode) ?? fallbackOutlinePathForCountry(tile.countryCode)}
-                        fill="none"
-                        stroke="#0FF0B3"
-                        strokeWidth="2"
+                        fill="#66BB6A"
+                        stroke="#1B5E20"
+                        strokeWidth="1.5"
                         strokeLinejoin="round"
                       />
                     </svg>

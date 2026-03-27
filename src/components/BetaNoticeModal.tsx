@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react'
 
 export function BetaNoticeModal() {
   const [isOpen, setIsOpen] = useState(true)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (!isOpen) return
@@ -19,12 +24,18 @@ export function BetaNoticeModal() {
     }
   }, [isOpen])
 
-  if (!isOpen) return null
+  // Don't render until client-side to avoid hydration issues
+  if (!mounted || !isOpen) return null
+
+  const handleClose = () => setIsOpen(false)
 
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4"
-      onClick={() => setIsOpen(false)}
+      onClick={handleClose}
+      onKeyDown={(e) => e.key === 'Escape' && handleClose()}
+      role="dialog"
+      aria-modal="true"
     >
       <div 
         className="gv-panel relative w-full max-w-[600px] p-6 text-center"
@@ -32,7 +43,7 @@ export function BetaNoticeModal() {
       >
         <button
           type="button"
-          onClick={() => setIsOpen(false)}
+          onClick={handleClose}
           className="absolute right-3 top-3 rounded border border-[var(--border)] px-2 py-0.5 text-xs text-[var(--text-muted)]"
           aria-label="Close"
         >
@@ -42,6 +53,9 @@ export function BetaNoticeModal() {
         <h2 className="mt-2 text-2xl font-bold text-[var(--text-primary)]">GeoVault is in early beta</h2>
         <p className="mt-3 text-sm text-[var(--text-muted)]">
           Some game data and results may be incomplete or incorrect while we validate and improve coverage.
+        </p>
+        <p className="mt-3 text-sm text-[var(--text-muted)]">
+          Note: Country Matrix is currently available on tablet and desktop only.
         </p>
         <button
           type="button"

@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "fetch-data": "node scripts/fetch-data.mjs"
+    "fetch-data": "node scripts/fetch-data.mjs",
+    "fix-ranks": "node scripts/fix-ranks.js"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.4.0",
     "clsx": "^2.1.0",
     "d3-geo": "^3.1.1",
     "i18n-iso-countries": "^7.14.0",

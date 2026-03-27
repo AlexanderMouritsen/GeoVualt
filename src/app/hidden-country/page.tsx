@@ -45,6 +45,16 @@ function getProgressStorageKey(mode: 'daily' | 'unlimited', challengeDate: strin
     : `${GEODLE_PROGRESS_KEY_PREFIX}:unlimited`
 }
 
+function getBoxClass(isCorrect: boolean, isMatch: boolean): string {
+  if (isCorrect) return 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.15)] text-[var(--accent-success)]'
+  return isMatch ? 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.15)] text-[var(--accent-success)]' : 'border-[var(--accent-danger)] bg-[rgba(183,79,75,0.15)] text-[var(--accent-danger)]'
+}
+
+function getBoxClassDesktop(isCorrect: boolean, isMatch: boolean): string {
+  if (isCorrect) return 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.2)] text-[var(--accent-success)]'
+  return isMatch ? 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.2)] text-[var(--accent-success)]' : 'border-[var(--accent-danger)] bg-[rgba(183,79,75,0.2)] text-[var(--accent-danger)]'
+}
+
 function directionLabel(direction: GeodleDirection): string {
   if (direction === 'higher') return '↑'
   if (direction === 'lower') return '↓'
@@ -52,7 +62,8 @@ function directionLabel(direction: GeodleDirection): string {
   return '○'
 }
 
-function directionCellClass(direction: GeodleDirection, isClose: boolean): string {
+function directionCellClass(direction: GeodleDirection, isClose: boolean, isCorrect: boolean = false): string {
+  if (isCorrect) return 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.2)] text-[var(--accent-success)]'
   if (direction === 'exact') return 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.2)] text-[var(--accent-success)]'
   if (direction === 'higher' || direction === 'lower') return 'border-[var(--accent-danger)] bg-[rgba(183,79,75,0.2)] text-[var(--accent-danger)]'
   if (isClose) return 'border-[var(--accent-gold)] bg-[rgba(180,136,72,0.2)] text-[var(--accent-gold)]'
@@ -496,7 +507,7 @@ export default function GeodlePage() {
 
       {guesses.length > 0 ? (
         <div className="mt-4 space-y-2 md:hidden">
-          {guesses.map((entry) => (
+          {[...guesses].reverse().map((entry) => (
             <div key={entry.guess.cca2} className="gv-panel p-3">
               <p className="text-sm font-semibold text-[var(--text-primary)]">
                 <span className="inline-flex items-center gap-2">
@@ -517,25 +528,29 @@ export default function GeodlePage() {
               </p>
 
               <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                <div className={`rounded-md border px-2 py-1 ${entry.feedback.continentMatch ? 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.15)]' : 'border-[var(--accent-danger)] bg-[rgba(183,79,75,0.15)]'}`}>
+                <div className={`rounded-md border px-2 py-1 ${getBoxClass(entry.guess.cca2 === target?.cca2, entry.feedback.continentMatch)}`}>
                   <p className="text-[var(--text-muted)]">Continent</p>
-                  <p className={entry.feedback.continentMatch ? 'text-[var(--accent-success)] font-semibold' : 'text-[var(--accent-danger)] font-semibold'}>{geodleContinentLabel(entry.guess)}</p>
+                  <p className={entry.guess.cca2 === target?.cca2 || entry.feedback.continentMatch ? 'text-[var(--accent-success)] font-semibold' : 'text-[var(--accent-danger)] font-semibold'}>{geodleContinentLabel(entry.guess)}</p>
                 </div>
-                <div className={`rounded-md border px-2 py-1 ${entry.feedback.isNeighbor ? 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.15)]' : 'border-[var(--accent-danger)] bg-[rgba(183,79,75,0.15)]'}`}>
+                <div className={`rounded-md border px-2 py-1 ${getBoxClass(entry.guess.cca2 === target?.cca2, entry.guess.landlocked === target?.landlocked)}`}>
+                  <p className="text-[var(--text-muted)]">Landlocked</p>
+                  <p className={entry.guess.cca2 === target?.cca2 || entry.guess.landlocked === target?.landlocked ? 'text-[var(--accent-success)] font-semibold' : 'text-[var(--accent-danger)] font-semibold'}>{entry.guess.landlocked ? 'Yes' : 'No'}</p>
+                </div>
+                <div className={`rounded-md border px-2 py-1 ${getBoxClass(entry.guess.cca2 === target?.cca2, entry.feedback.isNeighbor)}`}>
                   <p className="text-[var(--text-muted)]">Neighbor</p>
-                  <p className={entry.feedback.isNeighbor ? 'text-[var(--accent-success)] font-semibold' : 'text-[var(--accent-danger)] font-semibold'}>{entry.feedback.isNeighbor ? 'Yes' : 'No'}</p>
+                  <p className={entry.guess.cca2 === target?.cca2 || entry.feedback.isNeighbor ? 'text-[var(--accent-success)] font-semibold' : 'text-[var(--accent-danger)] font-semibold'}>{entry.feedback.isNeighbor ? 'Yes' : 'No'}</p>
                 </div>
-                <div className="rounded-md border border-[var(--border)] px-2 py-1">
+                <div className={`rounded-md border px-2 py-1 ${entry.guess.cca2 === target?.cca2 ? 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.15)] text-[var(--accent-success)]' : 'border-[var(--border)] text-[var(--text-primary)]'}`}>
                   <p className="text-[var(--text-muted)]">Temp</p>
-                  <p className="gv-mono text-[var(--text-primary)]">{formatTemperature(entry.guess)} {directionLabel(entry.feedback.temperature)}</p>
+                  <p className="gv-mono text-xs">{formatTemperature(entry.guess)} {directionLabel(entry.feedback.temperature)}</p>
                 </div>
-                <div className="rounded-md border border-[var(--border)] px-2 py-1">
+                <div className={`rounded-md border px-2 py-1 ${entry.guess.cca2 === target?.cca2 ? 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.15)] text-[var(--accent-success)]' : 'border-[var(--border)] text-[var(--text-primary)]'}`}>
                   <p className="text-[var(--text-muted)]">Population</p>
-                  <p className="gv-mono text-[var(--text-primary)]">{formatInteger(entry.guess.population)} {directionLabel(entry.feedback.population)}</p>
+                  <p className="gv-mono text-xs">{formatInteger(entry.guess.population)} {directionLabel(entry.feedback.population)}</p>
                 </div>
-                <div className="col-span-2 rounded-md border border-[var(--border)] px-2 py-1">
+                <div className={`rounded-md border px-2 py-1 ${entry.guess.cca2 === target?.cca2 ? 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.15)] text-[var(--accent-success)]' : 'border-[var(--border)] text-[var(--text-primary)]'}`}>
                   <p className="text-[var(--text-muted)]">Area</p>
-                  <p className="gv-mono text-[var(--text-primary)]">{formatInteger(entry.guess.area)} km² {directionLabel(entry.feedback.area)}</p>
+                  <p className="gv-mono text-xs">{formatInteger(entry.guess.area)} km² {directionLabel(entry.feedback.area)}</p>
                 </div>
               </div>
             </div>
@@ -558,7 +573,7 @@ export default function GeodlePage() {
               </tr>
             </thead>
             <tbody>
-              {guesses.map((entry, idx) => (
+              {[...guesses].reverse().map((entry, idx) => (
                 <tr key={entry.guess.cca2} className="border-t" style={{ borderColor: 'var(--border)', backgroundColor: idx % 2 === 0 ? 'var(--bg-base)' : 'var(--bg-surface)' }}>
                   <td className="px-2 py-2 text-[var(--text-primary)]">
                     <span className="inline-flex items-center gap-2">
@@ -578,26 +593,26 @@ export default function GeodlePage() {
                     </span>
                   </td>
                   <td className="px-2 py-2">
-                    <span className={`rounded-md border px-2 py-1 text-xs ${entry.feedback.continentMatch ? 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.2)] text-[var(--accent-success)]' : 'border-[var(--accent-danger)] bg-[rgba(183,79,75,0.2)] text-[var(--accent-danger)]'}`}>
+                    <span className={`rounded-md border px-2 py-1 text-xs ${getBoxClassDesktop(entry.guess.cca2 === target?.cca2, entry.feedback.continentMatch)}`}>
                       {geodleContinentLabel(entry.guess)}
                     </span>
                   </td>
                   <td className="px-2 py-2">
                     <span
-                      className={`rounded-md border px-2 py-1 text-xs ${entry.guess.landlocked === target?.landlocked ? 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.2)] text-[var(--accent-success)]' : 'border-[var(--accent-danger)] bg-[rgba(183,79,75,0.2)] text-[var(--accent-danger)]'}`}
+                      className={`rounded-md border px-2 py-1 text-xs ${getBoxClassDesktop(entry.guess.cca2 === target?.cca2, entry.guess.landlocked === target?.landlocked)}`}
                     >
                       {entry.guess.landlocked ? 'Yes' : 'No'}
                     </span>
                   </td>
                   <td className="px-2 py-2">
-                    <span className={`rounded-md border px-2 py-1 text-xs ${entry.feedback.isNeighbor ? 'border-[var(--accent-success)] bg-[rgba(74,157,111,0.2)] text-[var(--accent-success)]' : 'border-[var(--accent-danger)] bg-[rgba(183,79,75,0.2)] text-[var(--accent-danger)]'}`}>
+                    <span className={`rounded-md border px-2 py-1 text-xs ${getBoxClassDesktop(entry.guess.cca2 === target?.cca2, entry.feedback.isNeighbor)}`}>
                       {entry.feedback.isNeighbor ? 'Yes' : 'No'}
                     </span>
                   </td>
                   <td className="px-2 py-2">
                     <div className="space-y-1">
                       <p className="gv-mono text-xs text-[var(--text-primary)]">{formatTemperature(entry.guess)}</p>
-                      <span className={`gv-mono inline-flex min-w-14 items-center justify-center rounded-md border px-2 py-1 text-xs ${directionCellClass(entry.feedback.temperature, entry.feedback.temperatureClose)}`}>
+                      <span className={`gv-mono inline-flex min-w-14 items-center justify-center rounded-md border px-2 py-1 text-xs ${directionCellClass(entry.feedback.temperature, entry.feedback.temperatureClose, entry.guess.cca2 === target?.cca2)}`}>
                         {directionLabel(entry.feedback.temperature)}
                       </span>
                     </div>
@@ -605,7 +620,7 @@ export default function GeodlePage() {
                   <td className="px-2 py-2">
                     <div className="space-y-1">
                       <p className="gv-mono text-xs text-[var(--text-primary)]">{formatInteger(entry.guess.population)}</p>
-                      <span className={`gv-mono inline-flex min-w-14 items-center justify-center rounded-md border px-2 py-1 text-xs ${directionCellClass(entry.feedback.population, entry.feedback.populationClose)}`}>
+                      <span className={`gv-mono inline-flex min-w-14 items-center justify-center rounded-md border px-2 py-1 text-xs ${directionCellClass(entry.feedback.population, entry.feedback.populationClose, entry.guess.cca2 === target?.cca2)}`}>
                         {directionLabel(entry.feedback.population)}
                       </span>
                     </div>
@@ -613,7 +628,7 @@ export default function GeodlePage() {
                   <td className="px-2 py-2">
                     <div className="space-y-1">
                       <p className="gv-mono text-xs text-[var(--text-primary)]">{formatInteger(entry.guess.area)} km²</p>
-                      <span className={`gv-mono inline-flex min-w-14 items-center justify-center rounded-md border px-2 py-1 text-xs ${directionCellClass(entry.feedback.area, entry.feedback.areaClose)}`}>
+                      <span className={`gv-mono inline-flex min-w-14 items-center justify-center rounded-md border px-2 py-1 text-xs ${directionCellClass(entry.feedback.area, entry.feedback.areaClose, entry.guess.cca2 === target?.cca2)}`}>
                         {directionLabel(entry.feedback.area)}
                       </span>
                     </div>

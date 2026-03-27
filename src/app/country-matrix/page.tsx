@@ -1,6 +1,7 @@
 "use client"
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { CountrySearch } from '@/components/game/CountrySearch'
@@ -258,16 +259,18 @@ export default function GeoGridPage() {
   }, [puzzle, selectedCell])
 
   return (
-    <GameShell
-      title="Country Matrix"
-      accent="var(--gv-geogrid)"
-      accentLight="var(--bg-base)"
-      launchKey={`geogrid-${seedMode}`}
-      challengeScope="World"
-      challengeDate={challengeDate}
-      autoStart={dailyAlreadyCompleted}
-      headerRight={
-        <div className="flex items-center gap-2 text-xs">
+    <>
+      <div className="hidden sm:block">
+        <GameShell
+          title="Country Matrix"
+          accent="var(--gv-geogrid)"
+          accentLight="var(--bg-base)"
+          launchKey={`geogrid-${seedMode}`}
+          challengeScope="World"
+          challengeDate={challengeDate}
+          autoStart={dailyAlreadyCompleted}
+          headerRight={
+            <div className="flex items-center gap-2 text-xs">
           <button
             type="button"
             onClick={() => setSeedMode('daily')}
@@ -283,32 +286,31 @@ export default function GeoGridPage() {
             Unlimited
           </button>
         </div>
-      }
-    >
-      <h2 className="text-xl font-semibold text-[var(--text-primary)]">Fill each cell with a valid country intersection</h2>
-      <p className="mt-1 text-sm text-[var(--text-muted)]">Choose countries that satisfy both row and column criteria.</p>
-      <p className="mt-1 text-xs text-[var(--text-muted)]">Lower valid-pool percentage gives bigger point deduction for that cell.</p>
+          }
+        >
+          <h2 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)]">Fill each cell with a valid country intersection</h2>
+      <p className="mt-1 text-xs sm:text-sm text-[var(--text-muted)]">Choose countries that satisfy both row and column criteria.</p>
+      <p className="mt-1 text-[11px] sm:text-xs text-[var(--text-muted)]">Lower valid-pool percentage gives bigger point deduction for that cell.</p>
 
-      <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-[var(--text-muted)]">
-        <p className="gv-mono">
-          Guesses: {guessesUsed}
-          {infiniteMode ? ' (infinite)' : ` / ${MAX_GUESSES}`}
+      <div className="mt-3 flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-[var(--text-muted)]">
+        <p className="gv-mono text-[11px] sm:text-sm">
+          Guesses: {guessesUsed}{infiniteMode ? ' (∞)' : ` / ${MAX_GUESSES}`}
         </p>
-        <p className="gv-mono">Points: {currentPoints}</p>
-        <div className="inline-flex items-center gap-2 rounded-md border border-[var(--border)] p-1">
+        <p className="gv-mono text-[11px] sm:text-sm">Points: {currentPoints}</p>
+        <div className="inline-flex items-center gap-1 rounded-md border border-[var(--border)] p-0.5">
           <button
             type="button"
             onClick={() => setInfiniteMode(false)}
-            className={`rounded px-2 py-1 text-xs ${!infiniteMode ? 'bg-[var(--bg-elevated)] text-[var(--accent)]' : 'text-[var(--text-muted)]'}`}
+            className={`rounded px-1.5 py-0.5 text-[11px] sm:text-xs ${!infiniteMode ? 'bg-[var(--bg-elevated)] text-[var(--accent)]' : 'text-[var(--text-muted)]'}`}
           >
-            10 guesses
+            10
           </button>
           <button
             type="button"
             onClick={() => setInfiniteMode(true)}
-            className={`rounded px-2 py-1 text-xs ${infiniteMode ? 'bg-[var(--bg-elevated)] text-[var(--accent)]' : 'text-[var(--text-muted)]'}`}
+            className={`rounded px-1.5 py-0.5 text-[11px] sm:text-xs ${infiniteMode ? 'bg-[var(--bg-elevated)] text-[var(--accent)]' : 'text-[var(--text-muted)]'}`}
           >
-            Unlimited
+            ∞
           </button>
         </div>
       </div>
@@ -317,86 +319,113 @@ export default function GeoGridPage() {
       {error ? <p className="mt-4 rounded-md border border-[var(--accent-danger)] bg-transparent px-3 py-2 text-sm text-[var(--accent-danger)]">{error}</p> : null}
 
       {puzzle ? (
-        <div className="mt-4 overflow-x-auto">
-          <table className="min-w-full border-collapse text-sm">
-            <thead>
-              <tr>
-                <th className="border bg-[var(--bg-surface)] px-2 py-2" style={{ borderColor: 'var(--border)' }} />
-                {puzzle.cols.map((col, index) => (
-                  <th
-                    key={col.id}
-                    className="border bg-[var(--bg-surface)] px-2 py-2 text-left text-sm font-semibold text-[var(--text-primary)]"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    <span className="text-[var(--accent)]">C{index + 1}:</span> {col.label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
+        <div className="mt-4">
+          {/* Layout with row labels on left, headers above, grid on right */}
+          <div className="flex gap-2 sm:gap-3">
+            {/* Left: Row labels - compact */}
+            <div className="flex flex-col gap-2 sm:gap-3 flex-shrink-0">
+              {/* Empty space for column headers */}
+              <div className="h-10 sm:h-12" />
+              {/* Row labels */}
               {puzzle.rows.map((row, r) => (
-                <tr key={row.id}>
-                  <th
-                    className="border bg-[var(--bg-surface)] px-2 py-2 text-left text-sm font-semibold text-[var(--text-primary)]"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    <span className="text-[var(--accent)]">R{r + 1}:</span> {row.label}
-                  </th>
-                  {puzzle.cols.map((_, c) => {
-                    const key = geogridCellKey(r, c)
-                    const selected = selectedCell === key
-                    const countryCode = answers[key]
-                    const country = countryCode ? countryByCode.get(countryCode) : null
-                    const validCount = (puzzle.validByCell[key] ?? []).length
-                    const percent = cellPercent(validCount, countries.length)
-                    const deduction = deductionFromPercent(percent)
+                <div
+                  key={row.id}
+                  className="rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] px-1.5 sm:px-2 py-1 sm:py-1.5 text-center min-w-[80px] sm:min-w-[100px]"
+                >
+                  <p className="text-[9px] sm:text-xs font-medium text-[var(--text-primary)]">
+                    <span className="text-[var(--accent)] font-semibold text-[8px] sm:text-[10px] block">R{r + 1}</span>
+                    <span className="text-[7px] sm:text-[9px] leading-tight line-clamp-3">{row.label}</span>
+                  </p>
+                </div>
+              ))}
+            </div>
 
-                    return (
-                      <td key={key} className="border p-1" style={{ borderColor: 'var(--border)' }}>
+            {/* Right: Column headers and grid */}
+            <div className="flex-1 min-w-0">
+              {/* Column headers */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-2 sm:mb-3">
+                {puzzle.cols.map((col, index) => (
+                  <div
+                    key={col.id}
+                    className="rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] px-2 sm:px-3 py-1.5 sm:py-2 text-center"
+                  >
+                    <p className="text-xs sm:text-sm font-medium text-[var(--text-primary)]">
+                      <span className="text-[var(--accent)] font-semibold text-[10px] sm:text-xs block">C{index + 1}</span>
+                      <span className="text-[9px] sm:text-xs leading-tight line-clamp-2">
+                        {col.label}
+                      </span>
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Grid of cells */}
+              <div className="space-y-2 sm:space-y-3">
+                {puzzle.rows.map((row, r) => (
+                  <div key={row.id} className="grid grid-cols-3 gap-2 sm:gap-3">
+                    {puzzle.cols.map((_, c) => {
+                      const key = geogridCellKey(r, c)
+                      const selected = selectedCell === key
+                      const countryCode = answers[key]
+                      const country = countryCode ? countryByCode.get(countryCode) : null
+                      const validCount = (puzzle.validByCell[key] ?? []).length
+                      const percent = cellPercent(validCount, countries.length)
+                      const deduction = deductionFromPercent(percent)
+
+                      return (
                         <button
+                          key={key}
                           type="button"
                           onClick={() => {
                             if (dailyAlreadyCompleted || isFinished) return
                             setSelectedCell(key)
                           }}
-                          className={`min-h-20 w-full rounded-md border px-2 py-2 text-left ${selected ? 'border-[var(--accent)] bg-[var(--bg-elevated)]' : 'border-[var(--border)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)]'}`}
+                          className={`rounded-lg border-2 px-2 sm:px-3 py-2 sm:py-3 text-left transition-all ${
+                            selected
+                              ? 'border-[var(--accent)] bg-[var(--accent)]/10'
+                              : 'border-[var(--border)] bg-[var(--bg-surface)] hover:border-[var(--accent)]/50'
+                          } ${isFinished || dailyAlreadyCompleted ? 'cursor-default' : 'cursor-pointer'}`}
                         >
                           {country ? (
-                            <>
-                              <p className="text-sm font-medium text-[var(--text-primary)]">
-                                <span className="inline-flex items-center gap-2">
-                                  <Image
-                                    src={country.flagUrl}
-                                    alt={`${country.name} flag`}
-                                    width={18}
-                                    height={12}
-                                    className="rounded-sm border border-[var(--border)]"
-                                    unoptimized
-                                  />
-                                  <span>{country.name}</span>
-                                </span>
-                              </p>
-                              <div className="mt-2 space-y-1">
-                                <div className="h-1.5 w-full rounded bg-[var(--border)]">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-1">
+                                <Image
+                                  src={country.flagUrl}
+                                  alt={`${country.name} flag`}
+                                  width={14}
+                                  height={10}
+                                  className="rounded-sm border border-[var(--border)]"
+                                  unoptimized
+                                />
+                                <p className="text-[10px] sm:text-xs font-medium text-[var(--text-primary)] truncate flex-1">
+                                  {country.name}
+                                </p>
+                              </div>
+                              <div className="space-y-0.5">
+                                <div className="h-1 w-full rounded-full bg-[var(--border)] overflow-hidden">
                                   <div
-                                    className="h-1.5 rounded bg-[var(--accent)]"
+                                    className="h-full rounded-full bg-[var(--accent)]"
                                     style={{ width: `${Math.max(4, deduction)}%` }}
                                   />
                                 </div>
-                                <p className="gv-mono text-[10px] text-[var(--text-muted)]">Pool: {percent}% · Deducted: {deduction} pts</p>
+                                <p className="gv-mono text-[6px] sm:text-[9px] text-[var(--text-muted)]">
+                                  {percent}%·{deduction}pts
+                                </p>
                               </div>
-                            </>
+                            </div>
                           ) : (
-                            <p className="text-sm font-semibold text-[var(--text-primary)]">Select country</p>
+                            <p className="text-[10px] sm:text-xs font-semibold text-[var(--text-muted)] text-center py-2">
+                              Select
+                            </p>
                           )}
                         </button>
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      )
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       ) : null}
 
@@ -489,6 +518,20 @@ export default function GeoGridPage() {
           </div>
         </div>
       ) : null}
-    </GameShell>
+        </GameShell>
+      </div>
+
+      <div className="sm:hidden flex items-center justify-center min-h-screen px-4">
+        <div className="gv-panel max-w-md p-6 text-center">
+          <p className="gv-label">Country Matrix</p>
+          <h2 className="mt-2 text-xl font-bold text-[var(--text-primary)]">Not available on mobile</h2>
+          <p className="mt-3 text-sm text-[var(--text-muted)]">Country Matrix requires a screen width of at least 640px (tablet or larger). Please visit on a tablet or desktop to play.</p>
+          <p className="mt-4 text-xs text-[var(--text-muted)] italic">We're working on optimizing this for mobile and plan to roll out a fix as soon as possible.</p>
+          <Link href="/" className="mt-5 inline-block w-full gv-btn-outline px-4 py-2 rounded-md text-sm font-semibold">
+            Back to Home
+          </Link>
+        </div>
+      </div>
+    </>
   )
 }

@@ -29,6 +29,17 @@ export interface GeoGridPuzzle {
 
 const MIN_VALID_PER_CELL = 2
 
+const EXCLUDED_GLOBAL_RANKING_CCA2 = new Set([
+  'AQ', 'AS', 'AI', 'AW', 'AX', 'BL', 'BM', 'BQ', 'BV', 'CC', 'CK', 'CW', 'CX', 'FK', 'FO',
+  'GF', 'GG', 'GI', 'GL', 'GP', 'GU', 'HK', 'HM', 'IM', 'IO', 'JE', 'KY', 'MF', 'MO', 'MP',
+  'MQ', 'MS', 'NC', 'NF', 'NU', 'PF', 'PM', 'PN', 'PR', 'RE', 'SH', 'SJ', 'SX', 'TC', 'TF',
+  'TK', 'UM', 'VG', 'VI', 'WF', 'YT',
+])
+
+function isRankEligibleCountry(country: Country): boolean {
+  return !EXCLUDED_GLOBAL_RANKING_CCA2.has(country.cca2)
+}
+
 function toSet(arr: string[]): Set<string> {
   return new Set(arr)
 }
@@ -44,6 +55,7 @@ function cellKey(row: number, col: number): string {
 
 function topByMetric(countries: Country[], metric: 'population' | 'area', n: number): string[] {
   return countries
+    .filter(isRankEligibleCountry)
     .filter((country) => Number.isFinite(country[metric]))
     .sort((a, b) => b[metric] - a[metric])
     .slice(0, n)
@@ -236,6 +248,7 @@ export function buildGridCategories(countries: Country[]): GridCategory[] {
     minCountries = 8,
   ) => {
     const codes = countries
+      .filter(isRankEligibleCountry)
       .filter((country) => typeof country[key] === 'number')
       .sort((a, b) => (b[key] as number) - (a[key] as number))
       .slice(0, n)

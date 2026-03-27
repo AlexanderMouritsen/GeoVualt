@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
-import { Lora } from 'next/font/google'
+import { Nunito } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/react'
 import Link from 'next/link'
 import { BetaNoticeModal } from '@/components/BetaNoticeModal'
 import './globals.css'
 
-const lora = Lora({
+const nunito = Nunito({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-lora',
+  weight: ['500', '600', '700', '800'],
+  variable: '--font-ui',
 })
 
 export const metadata: Metadata = {
@@ -22,13 +22,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={lora.variable}>
-      <body>
+    <html lang="en" className={`${nunito.variable} overflow-x-hidden`}>
+      <body className="overflow-x-hidden">
         <BetaNoticeModal />
-        <header className="border-b border-[var(--border)] bg-[var(--bg-base)]">
-          <nav className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-6 px-6 py-4">
+        <Analytics />
+        <header className="border-b border-[var(--border)] bg-[var(--bg-surface)]/95 backdrop-blur-sm">
+          <nav className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-3 sm:gap-6 px-4 sm:px-6 py-4">
             <div className="flex items-center gap-3">
-              <Link href="/" className="text-[26px] font-bold uppercase tracking-[0.2em] text-[var(--text-primary)]">
+              <Link href="/" className="text-lg sm:text-[20px] font-extrabold uppercase tracking-[0.14em] text-[var(--text-primary)]">
                 GEOVAULT
               </Link>
             </div>
@@ -41,7 +42,7 @@ export default function RootLayout({
               <Link href="/history" className="gv-nav-link">History</Link>
             </div>
 
-            <div className="flex items-center gap-3 text-sm font-semibold">
+            <div className="flex items-center gap-2 sm:gap-3 text-xs font-semibold">
               <span className="hidden md:inline text-[var(--text-muted)]">English</span>
               <span className="hidden md:inline text-[var(--text-muted)]">|</span>
               <Link href="/report-bug" className="gv-nav-link text-xs">

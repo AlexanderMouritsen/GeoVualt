@@ -30,6 +30,22 @@ const LOW_COVERAGE_METRICS: MetricKey[] = [
 	'avgTemperatureCelsius',
 ]
 
+const INVERSE_RANK_METRICS = new Set<MetricKey>([
+  'co2EmissionsPerCapita',
+  'incarcerationRatePer100k',
+])
+
+const EXCLUDED_GLOBAL_RANKING_CCA2 = new Set([
+  'AQ', 'AS', 'AI', 'AW', 'AX', 'BL', 'BM', 'BQ', 'BV', 'CC', 'CK', 'CW', 'CX', 'FK', 'FO',
+  'GF', 'GG', 'GI', 'GL', 'GP', 'GU', 'HK', 'HM', 'IM', 'IO', 'JE', 'KY', 'MF', 'MO', 'MP',
+  'MQ', 'MS', 'NC', 'NF', 'NU', 'PF', 'PM', 'PN', 'PR', 'RE', 'SH', 'SJ', 'SX', 'TC', 'TF',
+  'TK', 'UM', 'VG', 'VI', 'WF', 'YT',
+])
+
+function isRankEligibleCountry(country: Country): boolean {
+  return !EXCLUDED_GLOBAL_RANKING_CCA2.has(country.cca2)
+}
+
 function dailyLockKey(scope: 'world' | 'europe'): string {
   return `geovault-georankle-daily-completed:${scope}`
 }
@@ -251,7 +267,9 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
     loadCountries()
       .then((payload) => {
         if (cancelled) return
-        const filtered = scope === 'europe' ? payload.filter((country) => country.region === 'Europe') : payload
+        const filtered = scope === 'europe'
+          ? payload.filter((country) => country.region === 'Europe' && isRankEligibleCountry(country))
+          : payload.filter(isRankEligibleCountry)
         setCountries(filtered)
       })
       .catch((loadError: unknown) => {
@@ -305,24 +323,34 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
     return new Map(sorted.map((item, index) => [item.country.cca2, index + 1]))
   }, [countries])
 
+  const isEurope = scope === 'europe'
+
   // Compute scope-specific rankings for all metrics
   const scopeRankingsByCca2 = useMemo(() => {
     const rankMap = new Map<string, Partial<Record<MetricKey, number>>>()
+    let rankedUniverse = countries.filter(isRankEligibleCountry)
+    
+    // Filter by region if scope is Europe
+    if (isEurope) {
+      rankedUniverse = rankedUniverse.filter((country) => country.region === 'Europe')
+    }
 
     // For each metric in the metric definitions, compute scope-specific ranks
     for (const definition of METRIC_DEFINITIONS) {
       const metricKey = definition.key as MetricKey
       
       // Filter countries that have non-null values for this metric
-      const withValues = countries
+      const withValues = rankedUniverse
         .filter((country) => {
           const value = country[metricKey]
           return value !== null && value !== undefined
         })
         .sort((a, b) => {
-          // Sort descending (highest value = best rank = #1)
           const aVal = (a[metricKey] ?? 0) as number
           const bVal = (b[metricKey] ?? 0) as number
+          if (INVERSE_RANK_METRICS.has(metricKey)) {
+            return aVal - bVal
+          }
           return bVal - aVal
         })
 
@@ -336,7 +364,7 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
     }
 
     return rankMap
-  }, [countries])
+  }, [countries, isEurope, scope])
   const usedMetrics = new Set(selections.map((selection) => selection.metric))
   const previousSelectionsByMetric = new Map<MetricKey, { roundIndex: number; rank: number }>()
   selections.slice(0, roundIndex).forEach((selection, idx) => {
@@ -424,7 +452,6 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
     setSeedOverride(randomSessionSeed())
   }
 
-  const isEurope = scope === 'europe'
   const scopeLabel = isEurope ? 'Europe' : 'World'
 
   const finishedSummary = useMemo(() => {
@@ -439,11 +466,18 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
         usedBeforeRound.add(picked.metric)
       }
 
-      // Use scope-specific rank if available, otherwise use global rank
+      // Use scope-specific rank if available, otherwise use global rank only if world scope
       let bestRank: number | null = null
       if (bestMetric) {
         const scopeRanks = scopeRankingsByCca2.get(round.country.cca2)
-        bestRank = scopeRanks?.[bestMetric] ?? round.country.rankings[bestMetric] ?? 999
+        if (scopeRanks?.[bestMetric] !== undefined) {
+          bestRank = scopeRanks[bestMetric]
+        } else if (!isEurope && round.country.rankings[bestMetric] !== undefined) {
+          // Only fall back to global ranking if world scope
+          bestRank = round.country.rankings[bestMetric]
+        } else {
+          bestRank = 999
+        }
       }
 
       return {
@@ -513,7 +547,7 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
 
       {!isLoading && !error && !isFinished && currentRound ? (
         <section className="space-y-4">
-          <div className="gv-panel gv-mono mx-auto inline-flex items-center gap-4 px-5 py-2 text-sm text-[var(--text-primary)]">
+          <div className="gv-mono mx-auto inline-flex items-center gap-3 px-3 py-1.5 text-sm text-[var(--text-primary)] bg-[var(--bg-surface)] rounded-md border border-[var(--border)]">
             <span>{roundIndex + 1} / {rounds.length}</span>
             <span className="text-[var(--text-muted)]">|</span>
             <span>{answeredRounds} answered</span>
@@ -521,7 +555,7 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
           </div>
 
           <div className="mx-auto max-w-[560px] rounded-md bg-[var(--bg-surface)] p-2 text-center">
-            <div className="relative mx-auto h-[180px] w-full max-w-[420px] overflow-hidden rounded-md border border-[var(--accent)]">
+            <div className="relative mx-auto aspect-video w-full max-w-[420px] overflow-hidden rounded-md border-2 border-black shadow-lg">
               <Image
                 src={currentRound.country.flagUrl}
                 alt={`${currentRound.country.name} flag`}
@@ -530,7 +564,7 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
                 unoptimized
               />
             </div>
-            <h2 className="mt-3 text-4xl font-bold tracking-[-0.01em] text-[var(--text-primary)]">{currentRound.country.name}</h2>
+            <h2 className="mt-2 text-3xl font-bold tracking-[-0.01em] text-[var(--text-primary)]">{currentRound.country.name}</h2>
           </div>
 
           <div className="mx-auto w-full max-w-[760px] space-y-2">
