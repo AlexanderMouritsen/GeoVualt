@@ -526,7 +526,7 @@ export default function GeoGridPage() {
           <p className="gv-label">Country Matrix</p>
           <h2 className="mt-2 text-xl font-bold text-[var(--text-primary)]">Not available on mobile</h2>
           <p className="mt-3 text-sm text-[var(--text-muted)]">Country Matrix requires a screen width of at least 640px (tablet or larger). Please visit on a tablet or desktop to play.</p>
-          <p className="mt-4 text-xs text-[var(--text-muted)] italic">We're working on optimizing this for mobile and plan to roll out a fix as soon as possible.</p>
+          <p className="mt-4 text-xs text-[var(--text-muted)] italic">We&apos;re working on optimizing this for mobile and plan to roll out a fix as soon as possible.</p>
           <Link href="/" className="mt-5 inline-block w-full gv-btn-outline px-4 py-2 rounded-md text-sm font-semibold">
             Back to Home
           </Link>

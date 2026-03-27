@@ -253,6 +253,7 @@ export default function ReportBugPage() {
               <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {images.map((img, idx) => (
                   <div key={idx} className="relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={URL.createObjectURL(img)}
                       alt={`Preview ${idx}`}
