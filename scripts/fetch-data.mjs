@@ -148,9 +148,11 @@ const SUPPLEMENTAL_METRICS = {
 		TR: 64, IR: 81, SA: 81, AE: 99, EG: 51, NG: 35, KE: 45, GH: 52, UA: 80, JO: 76,
 	},
 	tourismArrivals: {
-		FR: 89_000_000, ES: 83_000_000, IT: 65_000_000, US: 78_000_000, GB: 40_000_000, DE: 37_000_000, JP: 25_000_000,
+		FR: 89_000_000, ES: 83_000_000, IT: 65_000_000, US: 78_000_000, GB: 39_000_000, DE: 37_000_000, JP: 25_000_000,
 		CA: 33_000_000, AU: 9_800_000, NZ: 3_900_000, TH: 40_000_000, MY: 26_000_000, SG: 19_000_000, VN: 18_000_000,
-		MX: 29_000_000, BR: 6_000_000, TR: 51_000_000, SA: 65_000_000, AE: 18_000_000, EG: 14_000_000, ZA: 6_000_000,
+		MX: 45_000_000, BR: 6_000_000, TR: 51_000_000, SA: 20_000_000, AE: 18_000_000, EG: 14_000_000, ZA: 6_000_000,
+		CN: 66_000_000,
+		HR: 21_000_000, DK: 12_000_000,
 		CL: 5_500_000, AR: 2_900_000, PE: 4_400_000, CO: 4_100_000, AT: 2_300_000, CH: 1_200_000, GR: 3_400_000,
 		PT: 2_100_000, CZ: 2_000_000, PL: 1_100_000, HU: 1_000_000, RO: 900_000, IR: 5_800_000, IL: 3_600_000, JO: 4_000_000,
 	},
@@ -181,6 +183,18 @@ const RANK_METRICS = [
 	'goldReservesTonnes',
 	'militaryExpenditureGdpPercent',
 ]
+
+const INVERSE_RANK_METRICS = new Set([
+	'co2EmissionsPerCapita',
+	'incarcerationRatePer100k',
+])
+
+const EXCLUDED_GLOBAL_RANKING_CCA2 = new Set([
+	'AQ', 'AS', 'AI', 'AW', 'AX', 'BL', 'BM', 'BQ', 'BV', 'CC', 'CK', 'CW', 'CX', 'FK', 'FO',
+	'GF', 'GG', 'GI', 'GL', 'GP', 'GU', 'HK', 'HM', 'IM', 'IO', 'JE', 'KY', 'MF', 'MO', 'MP',
+	'MQ', 'MS', 'NC', 'NF', 'NU', 'PF', 'PM', 'PN', 'PR', 'RE', 'SH', 'SJ', 'SX', 'TC', 'TF',
+	'TK', 'UM', 'VG', 'VI', 'WF', 'YT',
+])
 
 // Metrics with low coverage that should not appear in game rotation
 const LOW_COVERAGE_METRICS = [
@@ -226,6 +240,18 @@ function pickLatestNonNullValue(rows) {
 		if (parsed !== null) return parsed
 	}
 	return null
+}
+
+function pickMaxNonNullValue(rows) {
+	let best = null
+	for (const row of rows) {
+		const parsed = safeNumber(row?.value)
+		if (parsed === null) continue
+		if (best === null || parsed > best) {
+			best = parsed
+		}
+	}
+	return best
 }
 
 async function fetchJson(url, label) {
@@ -303,7 +329,12 @@ function applySupplementalMetrics(countryMap) {
 			if (!country) continue
 			const value = safeNumber(raw)
 			if (value === null) continue
-			// Supplemental values are fallback only: keep upstream indicator values when present.
+			// Tourism arrivals use curated benchmark values to avoid pandemic-year distortions.
+			if (metric === 'tourismArrivals') {
+				country[metric] = value
+				continue
+			}
+			// Other supplemental values are fallback only: keep upstream indicator values when present.
 			if (safeNumber(country[metric]) === null) {
 				country[metric] = value
 			}
@@ -311,11 +342,24 @@ function applySupplementalMetrics(countryMap) {
 	}
 }
 
+function isRankEligibleCountry(country) {
+	return !EXCLUDED_GLOBAL_RANKING_CCA2.has(country.cca2)
+}
+
 function computeRankings(countries) {
+	const rankedUniverse = countries.filter(isRankEligibleCountry)
+
 	for (const metric of RANK_METRICS) {
-		const ranked = countries
+		const ranked = rankedUniverse
 			.filter((country) => safeNumber(country[metric]) !== null)
-			.sort((a, b) => (b[metric] ?? 0) - (a[metric] ?? 0))
+			.sort((a, b) => {
+				const aVal = safeNumber(a[metric]) ?? 0
+				const bVal = safeNumber(b[metric]) ?? 0
+				if (INVERSE_RANK_METRICS.has(metric)) {
+					return aVal - bVal
+				}
+				return bVal - aVal
+			})
 
 		ranked.forEach((country, index) => {
 			country.rankings[metric] = index + 1
@@ -393,7 +437,9 @@ async function applyWorldBankIndicators(countryMap) {
 				const country = countryMap.get(iso2)
 				if (!country) continue
 
-				const value = pickLatestNonNullValue(metricRows)
+				const value = fieldName === 'tourismArrivals'
+					? pickMaxNonNullValue(metricRows)
+					: pickLatestNonNullValue(metricRows)
 				if (value !== null) {
 					country[fieldName] = value
 					appliedCount++

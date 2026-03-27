@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { title, description, gameMode, steps, email } = body;
+    const formData = await request.formData();
+    const title = formData.get('title') as string;
+    const description = formData.get('description') as string;
+    const gameMode = formData.get('gameMode') as string;
+    const email = formData.get('email') as string;
 
     // Validate required fields
     if (!title || !description) {
@@ -13,13 +16,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log the bug report (you can hook this up to email, Discord, GitHub, etc.)
+    // Collect images
+    const images: { name: string; data: string }[] = [];
+    let imageIndex = 0;
+    while (formData.has(`image_${imageIndex}`)) {
+      const imageData = formData.get(`image_${imageIndex}`) as string;
+      images.push({ 
+        name: `screenshot_${imageIndex}.png`, 
+        data: imageData 
+      });
+      imageIndex++;
+    }
+
+    // Log the bug report
     console.log('=== BUG REPORT SUBMITTED ===');
     console.log(`Title: ${title}`);
     console.log(`Game Mode: ${gameMode || 'Not specified'}`);
     console.log(`Description: ${description}`);
-    if (steps) console.log(`Steps: ${steps}`);
     if (email) console.log(`Contact: ${email}`);
+    console.log(`Images: ${images.length}`);
     console.log(`Submitted: ${new Date().toISOString()}`);
     console.log('============================\n');
 
@@ -50,7 +65,16 @@ export async function POST(request: NextRequest) {
         
         const emoji = gameModeEmoji[gameMode as keyof typeof gameModeEmoji] || '🐛';
         
-        const discordMessage = {
+        // Build copy-friendly text report
+        const copyableReport = `**BUG REPORT**
+Title: ${title}
+Description: ${description}
+Game Mode: ${gameMode || 'Not specified'}
+Contact: ${email || 'Not provided'}
+Submitted: ${formattedTime}`;
+        
+        const discordMessage: any = {
+          content: `\`\`\`\n${copyableReport}\n\`\`\``,
           embeds: [
             {
               title: `🐛 ${title}`,
@@ -67,14 +91,14 @@ export async function POST(request: NextRequest) {
                   value: formattedTime,
                   inline: true,
                 },
-                steps ? {
-                  name: '📋 Steps to Reproduce',
-                  value: steps,
-                  inline: false,
-                } : null,
                 email ? {
                   name: '📧 Contact',
                   value: `[${email}](mailto:${email})`,
+                  inline: true,
+                } : null,
+                images.length > 0 ? {
+                  name: '🖼️ Screenshots',
+                  value: `${images.length} image${images.length > 1 ? 's' : ''} attached`,
                   inline: true,
                 } : null,
               ].filter(Boolean) as any[],
@@ -85,6 +109,13 @@ export async function POST(request: NextRequest) {
             },
           ],
         };
+
+        // If there are images, add embed with first image
+        if (images.length > 0) {
+          discordMessage.embeds[0].image = {
+            url: images[0].data, // base64 data URL
+          };
+        }
         
         await fetch(process.env.BUG_REPORT_WEBHOOK_URL, {
           method: 'POST',

@@ -6,17 +6,17 @@
 @tailwind utilities;
 
 :root {
-  --bg-base: #f6efe3;
-  --bg-surface: #fff8ee;
-  --bg-elevated: #efe3d2;
-  --border: #d8c7ac;
-  --border-bright: #b9a181;
-  --text-primary: #2f2417;
-  --text-muted: #7d6b52;
-  --accent: #7a5a35;
-  --accent-gold: #b48848;
-  --accent-danger: #b74f4b;
-  --accent-success: #4a9d6f;
+  --bg-base: #f3f6fb;
+  --bg-surface: #ffffff;
+  --bg-elevated: #eaf0f7;
+  --border: #d5deea;
+  --border-bright: #b7c5d8;
+  --text-primary: #101828;
+  --text-muted: #5d6b82;
+  --accent: #1f5fbf;
+  --accent-gold: #f08a24;
+  --accent-danger: #d64550;
+  --accent-success: #0f9d73;
 
   /* Compatibility aliases for existing component styles. */
   --gv-bg: var(--bg-base);
@@ -26,17 +26,22 @@
   --gv-text-muted: var(--text-muted);
   --gv-primary: var(--accent);
   --gv-accent: var(--accent-gold);
-  --gv-geodle: #8e7a56;
-  --gv-georankle: #7a5a35;
-  --gv-geoconnections: #b48848;
-  --gv-geogrid: #7f9272;
+  --gv-geodle: #f08a24;
+  --gv-georankle: #2e6be6;
+  --gv-geoconnections: #0f9d9a;
+  --gv-geogrid: #ef6c5b;
+
+  --gv-geodle-bg: #fff1e2;
+  --gv-georankle-bg: #e9efff;
+  --gv-geoconnections-bg: #e8f9f7;
+  --gv-geogrid-bg: #ffebe7;
 }
 
 body {
   margin: 0;
   color: var(--text-primary);
   background: var(--bg-base);
-  font-family: var(--font-lora), Georgia, serif;
+  font-family: var(--font-ui), 'Nunito', 'Segoe UI', sans-serif;
 }
 
 a {
@@ -53,6 +58,7 @@ h2,
 h3 {
   font-family: inherit;
   letter-spacing: 0;
+  line-height: 1.2;
 }
 
 button,
@@ -63,7 +69,7 @@ textarea {
 }
 
 .gv-label {
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 700;
@@ -72,15 +78,16 @@ textarea {
 
 .gv-sticker-card {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 14px;
   background: var(--bg-surface);
+  box-shadow: 0 8px 22px rgba(16, 24, 40, 0.05);
 }
 
 .gv-nav-link {
   display: inline-flex;
   align-items: center;
-  font-weight: 500;
-  font-size: 15px;
+  font-weight: 600;
+  font-size: 14px;
   color: var(--text-muted);
   transition: color 140ms ease;
 }
@@ -90,21 +97,23 @@ textarea {
 }
 
 .gv-daily-card {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  min-height: 190px;
-  padding: 20px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  min-height: 150px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   background: var(--bg-surface);
-  transition: background-color 130ms ease, border-color 130ms ease, transform 130ms ease;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
+  transition: background-color 130ms ease, border-color 130ms ease, transform 130ms ease, box-shadow 130ms ease;
 }
 
 .gv-daily-card:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   background: var(--bg-elevated);
   border-color: var(--border-bright);
+  box-shadow: 0 14px 28px rgba(16, 24, 40, 0.12);
 }
 
 .gv-mono {
@@ -113,13 +122,13 @@ textarea {
 
 .gv-panel {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--bg-surface);
 }
 
 .gv-btn-outline {
   border: 1px solid var(--accent);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--accent);
   background: transparent;
   font-weight: 600;
