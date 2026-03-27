@@ -364,7 +364,7 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
     }
 
     return rankMap
-  }, [countries, isEurope, scope])
+  }, [countries, isEurope])
   const usedMetrics = new Set(selections.map((selection) => selection.metric))
   const previousSelectionsByMetric = new Map<MetricKey, { roundIndex: number; rank: number }>()
   selections.slice(0, roundIndex).forEach((selection, idx) => {
@@ -490,7 +490,7 @@ export function GeoRankleGame({ scope }: GeoRankleGameProps) {
         bestRank,
       }
     })
-  }, [metricPool, rounds, selections, scopeRankingsByCca2])
+  }, [metricPool, rounds, selections, scopeRankingsByCca2, isEurope])
 
   return (
     <GameShell
